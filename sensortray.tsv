@@ -1,0 +1,24 @@
+[L:Tsv|
+code	UTF-8
+enter	LF
+tab	8
+program	kantray
+LTsvver	20160405T171612
+modify	20160407R204336
+|L:Tsv]
+
+[sensortray|
+blinkC	80
+blinkT	1000
+wait	3000
+font	kantray5x5comic,12
+tray	sensorC.png
+sensor	sensors
+tempO	Core0 Temp:   +
+tempC	°C
+|sensortray]
+
+
+# Copyright (c) 2016 ooblog
+# License: MIT
+# https://github.com/ooblog/LTsv9kantray/blob/master/LICENSE

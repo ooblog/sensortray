@@ -1,2 +1,46 @@
-# sensortray
-「sensortray」はCPU温度(sensors)を通知タスクトレイ(Notify)に表示します。
+# 「sensortray」はCPU温度&#40;sensors&#41;を通知タスクトレイ&#40;Notify&#41;に表示します。
+
+## セットアップ方法
+
+sensors&#40;lm&#95;sensors&#41;コマンドを使えるようにしておくこと。  
+ほとんどのLinuxで公式パッケージから追加インストールできるはず。  
+「lm sensors」の設定はしなくても多分「sensors」コマンドでCPU温度「Core 0」は最初から取得できるはず。  
+
+[lm sensors - ArchWiki](https://wiki.archlinuxjp.org/index.php/Lm_sensors)  
+>lm&#95;sensors (Linux monitoring sensors) は温度、電圧、ファンを監視するフリーでオープンソースなツールとドライバです。  
+
+[ハードウェアから温度情報などを取得する](http://gihyo.jp/admin/serial/01/ubuntu-recipe/0183)  
+>Ubuntuに導入するには，UbuntuソフトウェアセンターやSynapticパッケージマネジャーでパッケージ「lm-sensors」をインストールしてください。  
+
+環境毎に表示テキストの空白数や摂氏温度記号の文字コードが違うなどの誤差があります。  
+
+    Core0 Temp:   +65.0°C
+    Core 0:         +35.0°C
+    Core 0:      +47.0℃
+
+「[sensortray.tsv](sensortray.tsv)」の「tempO」「tempC」を書き換えて誤差を吸収してください。  
+
+## 操作方法。
+
+通知タスクトレイ&#40;Notify&#41左クリック→アイコン点滅条件の数値設定ウィンドウ表示。  
+通知タスクトレイ&#40;Notify&#41右クリック→数値設定初期化。  
+
+## 動作環境。
+
+Python2.7.3&#40;PuppyLinux571JP&#41;およびPython3.4.3&#40;Wine1.7.18&#41;で動作を確認しています。  
+Windowsでは以下の２点で動作しません。  
+1.Tkinterで通知タスクトレイ&#40;Notify&#41;クリックからのポップアップメニュー出現方法が不明。  
+2.そもそもWindowsでCPU温度を所得する方法が不明。  
+
+## アイコン「sensorC.icl」の置き換え関連&#40;Windows&#41;。
+
+付録の「celdivsave.py」は「sensorC.png」を分割して「sensorC.icl」を作る過程で作ったツールです。
+「sensorC&#91;&#63;&#63;&#93;.png」をアイコンDLL「sensorC.icl」に変換するには別途Windows系のソフトが必要です。
+[複数のアイコンを簡単にICL/DLLファイルへまとめられる「アイコンパッキング」](http://www.forest.impress.co.jp/docs/review/20130822_612100.html)
+>「アイコンパッキング」は、複数のICO形式のアイコンファイルを簡単に1つのICL/DLLファイルへまとめられるソフト。
+
+## ライセンス・著作権など。
+
+Copyright (c) 2016 ooblog  
+License: MIT  
+[https://github.com/ooblog/sensortray/blob/master/LICENSE](https://github.com/ooblog/sensortray/blob/master/LICENSE "https://github.com/ooblog/sensortray/blob/master/LICENSE")  
