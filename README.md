@@ -1,4 +1,4 @@
-# 「sensortray」はCPU温度&#40;sensors&#41;を通知タスクトレイ&#40;Notify&#41;に表示します。
+# 「sensortray」はCPU温度&#40;sensors&#41;を通知タスクトレイ&#40;Notify&#41;表示のPythonによる実装です。
 
 ## セットアップ方法
 
