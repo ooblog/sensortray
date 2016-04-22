@@ -35,7 +35,7 @@ LTsv_widgetOBJ={}; LTsv_widgetOBJcount=0
 LTsv_timerOBJ={}; LTsv_timer_cbk={}
 LTsv_canvas_motion_X,LTsv_canvas_motion_Y=0,0
 canvas_EMLtimeout,canvas_EMLenter,canvas_EMLmotion,canvas_EMLleave,canvas_EMLafter={},{},{},{},{}
-LTsv_pictureOBJ={}
+LTsv_pictureOBJ,LTsv_pictureW,LTsv_pictureH={},{},{}
 LTsv_iconOBJ={}; LTsv_iconOBJnotify=[]
 LTsv_popupmenuOBJ={}
 LTsv_default_iconuri=""
@@ -105,6 +105,8 @@ def LTsv_global_widgetgetltsv():                    return LTsv_widgetLTSV
 def LTsv_global_widgetgetpage(LTsv_widgetPAGENAME): return LTsv_getpage(LTsv_widgetLTSV,LTsv_widgetPAGENAME)
 def LTsv_global_widgetOBJ(LTsv_objid):              return LTsv_widgetOBJ[LTsv_objid]
 def LTsv_global_pictureOBJ(LTsv_objid):             return LTsv_pictureOBJ[LTsv_objid]
+def LTsv_global_pictureW(LTsv_objid):               return LTsv_pictureW[LTsv_objid]
+def LTsv_global_pictureH(LTsv_objid):               return LTsv_pictureH[LTsv_objid]
 def LTsv_global_iconOBJ(LTsv_objid):                return LTsv_iconOBJ[LTsv_objid]
 def LTsv_global_popupmenuOBJ(LTsv_objid):           return LTsv_popupmenuOBJ[LTsv_objid]
 
@@ -836,6 +838,7 @@ LTsv_GDK_POINTER_MOTION_MASK=1<<2
 LTsv_GDK_BUTTON_RELEASE_MASK=1<<9
 LTsv_GDK_KEY_PRESS_MASK=     1<<10
 LTsv_GDK_SCROLL_MASK=        1<<21
+LTsv_GDK_ARCFILL=23040
 
 def LTsv_canvas_new(LTsv_windowPAGENAME,widget_n=None,widget_x=0,widget_y=0,widget_w=16,widget_h=16,event_p=None,event_r=None,event_e=None,event_m=None,event_l=None,event_w=100):
     global LTsv_widgetLTSV,canvas_EMLtimeout,canvas_EMLenter,canvas_EMLmotion,canvas_EMLleave
@@ -926,93 +929,21 @@ def LTsv_canvas_new(LTsv_windowPAGENAME,widget_n=None,widget_x=0,widget_y=0,widg
     LTsv_widgetLTSV=LTsv_putpage(LTsv_widgetLTSV,LTsv_widgetPAGENAME,LTsv_widgetPAGE)
     return LTsv_widgetPAGENAME
 
-LTsv_GDK_ARCFILL=23040
-def LTsv_draw_color(LTsv_canvasPAGENAME,draw_k="line",draw_t="draw_t",draw_x=0,draw_y=0,draw_w=16,draw_h=16,draw_s=0,draw_e=math.pi*2,draw_c=None,draw_b=None,draw_l=False,draw_f=None,draw_g="LTsv_draw_color"):
-    global LTsv_widgetLTSV
-    LTsv_canvasPAGE=LTsv_getpage(LTsv_widgetLTSV,LTsv_canvasPAGENAME)
-    if LTsv_GUI == LTsv_GUI_GTK2:
-        canvas_o=LTsv_widgetOBJ[LTsv_readlinerest(LTsv_canvasPAGE,"widgetobj")]
-        canvas_m=LTsv_widgetOBJ[LTsv_readlinerest(LTsv_canvasPAGE,"widgetpixmap")]
-        canvas_g=LTsv_widgetOBJ[LTsv_readlinerest(LTsv_canvasPAGE,"widgetgc")]
-        if draw_c != None:
-            widget_gcfcolor=LTsv_GDKCOLOR()
-            LTsv_libgdk.gdk_color_parse(draw_c.encode("utf-8"),ctypes.pointer(widget_gcfcolor))
-            LTsv_libgdk.gdk_gc_set_rgb_fg_color(canvas_g,ctypes.pointer(widget_gcfcolor))
-        if draw_b != None:
-            widget_gcbcolor=LTsv_GDKCOLOR()
-            LTsv_libgdk.gdk_color_parse(draw_b.encode("utf-8"),ctypes.pointer(widget_gcbcolor))
-            LTsv_libgdk.gdk_gc_set_rgb_bg_color(canvas_g,ctypes.pointer(widget_gcbcolor))
-        if draw_k == "line":
-            LTsv_libgdk.gdk_draw_line(canvas_m,canvas_g,draw_x,draw_y,draw_x+draw_w,draw_y+draw_h)
-        if draw_k == "rect":
-            if draw_w < 0: draw_x,draw_w=draw_x+draw_w,-draw_w
-            if draw_h < 0: draw_y,draw_h=draw_y+draw_h,-draw_h
-            LTsv_libgdk.gdk_draw_rectangle(canvas_m,canvas_g,draw_l,draw_x,draw_y,draw_w,draw_h)
-        if draw_k == "arc":
-            if draw_w < 0: draw_x,draw_w=draw_x+draw_w,-draw_w
-            if draw_h < 0: draw_y,draw_h=draw_y+draw_h,-draw_h
-            LTsv_libgdk.gdk_draw_arc(canvas_m,canvas_g,draw_l,draw_x,draw_y,draw_w,draw_h,int(draw_s*LTsv_GDK_ARCFILL/2.0/math.pi),int(draw_e*LTsv_GDK_ARCFILL/2.0/math.pi))
-        if draw_k == "point":
-            LTsv_libgdk.gdk_draw_point(canvas_m,canvas_g,draw_x,draw_y)
-        if draw_k == "circle":
-            draw_w,draw_h=abs(draw_w),abs(draw_h)
-            LTsv_libgdk.gdk_draw_arc(canvas_m,canvas_g,draw_l,draw_x-(draw_w//2),draw_y-(draw_h//2),draw_w,draw_h,0,LTsv_GDK_ARCFILL)
-        if draw_k == "square":
-            draw_w,draw_h=abs(draw_w),abs(draw_h)
-            LTsv_libgdk.gdk_draw_rectangle(canvas_m,canvas_g,draw_l,draw_x-(draw_w//2),draw_y-(draw_h//2),draw_w,draw_h)
-        if draw_k == "text":
-            pango_l=LTsv_libgtk.gtk_widget_create_pango_layout(canvas_o,0)
-            LTsv_libgtk.pango_layout_set_text(pango_l,draw_t.encode("utf-8","xmlcharrefreplace"),-1)
-            if draw_f != None:
-                LTsv_fontDesc=LTsv_libgtk.pango_font_description_from_string(draw_f.encode("utf-8"))
-                LTsv_libgtk.pango_layout_set_font_description(pango_l,LTsv_fontDesc)
-            if draw_c == None and draw_b == None:
-                LTsv_libgdk.gdk_draw_layout(canvas_m,canvas_g,draw_x,draw_y,pango_l)
-            else:
-                LTsv_libgdk.gdk_draw_layout_with_colors(canvas_m,canvas_g,draw_x,draw_y,pango_l,ctypes.pointer(widget_gcfcolor) if draw_c != None else 0,ctypes.pointer(widget_gcbcolor) if draw_b != None else 0)
-            LTsv_libobj.g_object_unref(pango_l)
-            if draw_f != None:
-                LTsv_libgtk.pango_font_description_free(LTsv_fontDesc)
-        if draw_k == "picture":
-            if not draw_t in LTsv_pictureOBJ:
-                LTsv_draw_picture_load(draw_t)
-            picture_o=LTsv_pictureOBJ[draw_t]
-            if picture_o != None:
-                picture_w,picture_h=LTsv_libgdk.gdk_pixbuf_get_width(picture_o),LTsv_libgdk.gdk_pixbuf_get_height(picture_o)
-                LTsv_libgdk.gdk_draw_pixbuf(canvas_m,canvas_g,picture_o,0,0,draw_x,draw_y,picture_w,picture_h,0,0,0)
-    if LTsv_GUI == LTsv_GUI_Tkinter:
-        canvas_o=LTsv_widgetOBJ[LTsv_readlinerest(LTsv_canvasPAGE,"widgetobj")]
-        if draw_k == "line":
-            canvas_o.create_line(draw_x,draw_y,draw_x+draw_w,draw_y+draw_h,fill=draw_c,tag=draw_g)
-        if draw_k == "rect":
-            canvas_o.create_rectangle(draw_x,draw_y,draw_x+draw_w,draw_y+draw_h,fill=(draw_c if draw_l else None),outline=(draw_c if draw_c != None else None),tag=draw_g)
-        if draw_k == "arc":
-            canvas_o.create_arc(draw_x,draw_y,draw_x+draw_w,draw_y+draw_h,fill=(draw_c if draw_l else None),outline=(draw_c if draw_c != None else None),start=draw_s*360.0/2.0/math.pi,extent=draw_e*360.0/2.0/math.pi,tag=draw_g)
-        if draw_k == "point":
-            canvas_o.create_line(draw_x,draw_y,draw_x+1,draw_y+1,fill=draw_c,tag=draw_g)
-        if draw_k == "circle":
-            canvas_o.create_oval(draw_x-(draw_w//2),draw_y-(draw_h//2),draw_x+(draw_w//2),draw_y+(draw_h//2),fill=(draw_c if draw_l else None),outline=(draw_c if draw_c != None else None),tag=draw_g)
-        if draw_k == "square":
-            canvas_o.create_rectangle(draw_x-(draw_w//2),draw_y-(draw_h//2),draw_x+(draw_w//2),draw_y+(draw_h//2),fill=(draw_c if draw_l else None),outline=(draw_c if draw_c != None else None),tag=draw_g)
-        if draw_k == "text":
-            canvas_o.create_text(draw_x,draw_y,text=draw_t,font=LTsv_fonttuple(draw_f),anchor="nw",fill=draw_c,tag=draw_g)
-        if draw_k == "picture":
-            if not draw_t in LTsv_pictureOBJ:
-                LTsv_draw_picture_load(draw_t)
-            picture_o=LTsv_pictureOBJ[draw_t]
-            if picture_o != None:
-                picture_w,picture_h=picture_o.width(),picture_o.height()
-                canvas_o.create_image(draw_x,draw_y,image=picture_o,anchor="nw",tag=draw_g)
-
 def LTsv_draw_picture_load(LTsv_picturepath):
-    global LTsv_pictureOBJ
+    global LTsv_pictureOBJ,LTsv_pictureW,LTsv_pictureH
     if os.path.isfile(LTsv_picturepath):
         if LTsv_GUI == LTsv_GUI_GTK2:
             LTsv_pictureOBJ[LTsv_picturepath]=LTsv_libgdk.gdk_pixbuf_new_from_file(LTsv_picturepath.encode("utf-8","xmlcharrefreplace"),0)
+            LTsv_pictureW[LTsv_picturepath]=LTsv_libgdk.gdk_pixbuf_get_width(LTsv_pictureOBJ[LTsv_picturepath])
+            LTsv_pictureH[LTsv_picturepath]=LTsv_libgdk.gdk_pixbuf_get_height(LTsv_pictureOBJ[LTsv_picturepath])
         if LTsv_GUI == LTsv_GUI_Tkinter:
             LTsv_pictureOBJ[LTsv_picturepath]=Tk.PhotoImage(file=LTsv_picturepath)
+            LTsv_pictureW[LTsv_picturepath]=LTsv_pictureOBJ[LTsv_picturepath].width()
+            LTsv_pictureH[LTsv_picturepath]=LTsv_pictureOBJ[LTsv_picturepath].height()
     else:
         LTsv_pictureOBJ[LTsv_picturepath]=None
+        LTsv_pictureW[LTsv_picturepath]=0
+        LTsv_pictureH[LTsv_picturepath]=0
     return LTsv_pictureOBJ[LTsv_picturepath]
 
 def LTsv_draw_picture_celldiv(LTsv_picturepath,picture_divw,picture_divh):
@@ -1030,8 +961,12 @@ def LTsv_draw_picture_celldiv(LTsv_picturepath,picture_divw,picture_divh):
         if LTsv_GUI == LTsv_GUI_GTK2:
             for picture_y in range(picture_divh):
                 for picture_x in range(picture_divw):
-                    LTsv_pictureOBJ["{0}[{1}]".format(LTsv_picturepath,picture_y*picture_divw+picture_x)]= \
-                    LTsv_libgdk.gdk_pixbuf_new_subpixbuf(ctypes.c_char_p(picture_o),picture_x*cell_w,picture_y*cell_h,cell_w,cell_h)
+#                    LTsv_pictureOBJ["{0}[{1}]".format(LTsv_picturepath,picture_y*picture_divw+picture_x)]= \
+#                    LTsv_libgdk.gdk_pixbuf_new_subpixbuf(ctypes.c_char_p(picture_o),picture_x*cell_w,picture_y*cell_h,cell_w,cell_h)
+                    picture_t="{0}[{1}]".format(LTsv_picturepath,picture_y*picture_divw+picture_x)
+                    LTsv_pictureOBJ[picture_t]=LTsv_libgdk.gdk_pixbuf_new_subpixbuf(ctypes.c_char_p(picture_o),picture_x*cell_w,picture_y*cell_h,cell_w,cell_h)
+                    LTsv_pictureW[picture_t]=LTsv_libgdk.gdk_pixbuf_get_width(LTsv_pictureOBJ[picture_t])
+                    LTsv_pictureH[picture_t]=LTsv_libgdk.gdk_pixbuf_get_height(LTsv_pictureOBJ[picture_t])
         if LTsv_GUI == LTsv_GUI_Tkinter:
             pass
 
@@ -1068,30 +1003,6 @@ def LTsv_draw_canvas_save(LTsv_canvasPAGENAME,LTsv_picturenewpath):
 #        canvas_d.paste(canvas_o,(0,0))
 #        canvas_d.save(fileName,returnFormat(LTsv_picturenewext))
 
-def LTsv_draw_picture_W(LTsv_picturepath):
-    picture_w=0
-    if not LTsv_picturepath in LTsv_pictureOBJ:
-        LTsv_draw_picture_load(LTsv_picturepath)
-    picture_o=LTsv_pictureOBJ[LTsv_picturepath]
-    if picture_o != None:
-        if LTsv_GUI == LTsv_GUI_GTK2:
-            picture_w=LTsv_libgdk.gdk_pixbuf_get_width(LTsv_pictureOBJ[LTsv_picturepath])
-        if LTsv_GUI == LTsv_GUI_Tkinter:
-            picture_w=LTsv_pictureOBJ[LTsv_picturepath].width()
-    return picture_w
-
-def LTsv_draw_picture_H(LTsv_picturepath):
-    picture_h=0
-    if not LTsv_picturepath in LTsv_pictureOBJ:
-        LTsv_draw_picture_load(LTsv_picturepath)
-    picture_o=LTsv_pictureOBJ[LTsv_picturepath]
-    if picture_o != None:
-        if LTsv_GUI == LTsv_GUI_GTK2:
-            picture_h=LTsv_libgdk.gdk_pixbuf_get_height(LTsv_pictureOBJ[LTsv_picturepath])
-        if LTsv_GUI == LTsv_GUI_Tkinter:
-            picture_h=LTsv_pictureOBJ[LTsv_picturepath].height()
-    return picture_h
-
 LTsv_GTKcanvasPAGE,LTsv_GTKcanvas_o,LTsv_GTKcanvas_m,LTsv_GTKcanvas_g,LTsv_GTKcanvas_gccolor,LTsv_GTKcanvas_font=None,None,None,None,None,""
 def LTsv_drawGTK_selcanvas(LTsv_canvasPAGENAME):
     if LTsv_GUI == LTsv_GUI_GTK2:
@@ -1105,7 +1016,7 @@ def LTsv_drawGTK_selcanvas(LTsv_canvasPAGENAME):
         LTsv_drawGTK_color()
 
 LTsv_TkintercanvasPAGE,LTsv_Tkintercanvas_o,LTsv_Tkintercanvas_color,LTsv_Tkintercanvas_TAG,LTsv_Tkintercanvas_font=None,None,None,None,None
-def LTsv_drawTkinter_selcanvas(LTsv_canvasPAGENAME,draw_g="LTsv_draw_color"):
+def LTsv_drawTkinter_selcanvas(LTsv_canvasPAGENAME,draw_g="LTsv_draw_tkTAG"):
     if LTsv_GUI == LTsv_GUI_Tkinter:
         global LTsv_TkintercanvasPAGE,LTsv_Tkintercanvas_o,LTsv_Tkintercanvas_color,LTsv_Tkintercanvas_TAG
         LTsv_TkintercanvasPAGE=LTsv_getpage(LTsv_widgetLTSV,LTsv_canvasPAGENAME)
@@ -1184,6 +1095,18 @@ def LTsv_drawTkinter_circlesfill(draw_wh=16,*draw_xy):
         draw_x,draw_y=draw_xy[draw_xy_count*2],draw_xy[draw_xy_count*2+1]
         LTsv_Tkintercanvas_o.create_oval(-draw_wh//2+draw_x,-draw_wh//2+draw_y,draw_wh//2+draw_x,draw_wh//2+draw_y,fill=LTsv_Tkintercanvas_color,outline=LTsv_Tkintercanvas_color,tag=LTsv_Tkintercanvas_TAG)
 
+def LTsv_drawGTK_arc(draw_x,draw_y,draw_w,draw_h,draw_s=-math.pi,draw_e=math.pi):
+    LTsv_libgdk.gdk_draw_arc(LTsv_GTKcanvas_m,LTsv_GTKcanvas_g,False,draw_x,draw_y,draw_w,draw_h,int(draw_s*LTsv_GDK_ARCFILL/2.0/math.pi),int(draw_e*LTsv_GDK_ARCFILL/2.0/math.pi))
+
+def LTsv_drawTkinter_arc(draw_x,draw_y,draw_w,draw_h,draw_s=-math.pi,draw_e=math.pi):
+    LTsv_Tkintercanvas_o.create_arc(draw_x,draw_y,draw_x+draw_w,draw_y+draw_h,fill="",outline=LTsv_Tkintercanvas_color,start=draw_s*360.0/2.0/math.pi,extent=draw_e*360.0/2.0/math.pi,tag=LTsv_Tkintercanvas_TAG)
+
+def LTsv_drawGTK_arcfill(draw_x,draw_y,draw_w,draw_h,draw_s=-math.pi,draw_e=math.pi):
+    LTsv_libgdk.gdk_draw_arc(LTsv_GTKcanvas_m,LTsv_GTKcanvas_g,True,draw_x,draw_y,draw_w,draw_h,int(draw_s*LTsv_GDK_ARCFILL/2.0/math.pi),int(draw_e*LTsv_GDK_ARCFILL/2.0/math.pi))
+
+def LTsv_drawTkinter_arcfill(draw_x,draw_y,draw_w,draw_h,draw_s=-math.pi,draw_e=math.pi):
+    LTsv_Tkintercanvas_o.create_arc(draw_x,draw_y,draw_x+draw_w,draw_y+draw_h,fill=LTsv_Tkintercanvas_color,outline=LTsv_Tkintercanvas_color,start=draw_s*360.0/2.0/math.pi,extent=draw_e*360.0/2.0/math.pi,tag=LTsv_Tkintercanvas_TAG)
+
 def LTsv_drawGTK_font(draw_f=""):
     global LTsv_GTKcanvas_font
     LTsv_GTKcanvas_font=draw_f
@@ -1204,6 +1127,14 @@ def LTsv_drawGTK_text(draw_t="",draw_x=0,draw_y=0):
 def LTsv_drawTkinter_text(draw_t="",draw_x=0,draw_y=0):
     LTsv_Tkintercanvas_o.create_text(draw_x,draw_y,text=draw_t,font=LTsv_Tkintercanvas_font,anchor="nw",fill=LTsv_Tkintercanvas_color,tag=LTsv_Tkintercanvas_TAG)
 
+def LTsv_drawGTK_picture(draw_t="",draw_x=0,draw_y=0):
+    picture_o,picture_w,picture_h=LTsv_pictureOBJ[draw_t],LTsv_pictureW[draw_t],LTsv_pictureH[draw_t]
+    LTsv_libgdk.gdk_draw_pixbuf(LTsv_GTKcanvas_m,LTsv_GTKcanvas_g,picture_o,0,0,draw_x,draw_y,picture_w,picture_h,0,0,0)
+
+def LTsv_drawTkinter_picture(draw_t="",draw_x=0,draw_y=0):
+    picture_o,picture_w,picture_h=LTsv_pictureOBJ[draw_t],LTsv_pictureW[draw_t],LTsv_pictureH[draw_t]
+    LTsv_Tkintercanvas_o.create_image(draw_x,draw_y,image=picture_o,anchor="nw",tag=LTsv_Tkintercanvas_TAG)
+
 def LTsv_clockwise(*draw_xy):
     clockwise=0
     if len(draw_xy) >= 6:
@@ -1223,7 +1154,7 @@ def LTsv_draw_queue(LTsv_canvasPAGENAME):
     if LTsv_GUI == LTsv_GUI_Tkinter:
         pass
 
-def LTsv_draw_delete(LTsv_canvasPAGENAME,draw_g="LTsv_draw_color"):
+def LTsv_draw_delete(LTsv_canvasPAGENAME,draw_g="LTsv_draw_tkTAG"):
     global LTsv_widgetLTSV
     LTsv_canvasPAGE=LTsv_getpage(LTsv_widgetLTSV,LTsv_canvasPAGENAME)
     if LTsv_GUI == LTsv_GUI_GTK2:
@@ -1616,43 +1547,43 @@ def LTsv_notifyicon_new(LTsv_windowPAGENAME,notify_n=None,widget_t="",widget_u="
 def debug_canvas(window_objvoid=None,window_objptr=None):
     global debug_scaleRGB
     LTsv_draw_delete(debug_keysetup_canvas)
-    LTsv_draw_color(debug_keysetup_canvas,draw_k="rect",draw_x=0,draw_y=0,draw_w=debug_canvas_W,draw_h=debug_canvas_H,draw_c="#fffff0",draw_l=True)
-    LTsv_draw_color(debug_keysetup_canvas,draw_k="rect",draw_x=0,draw_y=0,draw_w=debug_kanzip_DLprogres_WH,draw_h=debug_kanzip_DLprogres_WH,draw_c="white",draw_l=True)
+    LTsv_drawtk_selcanvas(debug_keysetup_canvas)
+    LTsv_drawtk_font(debug_font_entry)
+    LTsv_drawtk_color("#fffff0"); LTsv_drawtk_polygonfill(0,0,debug_canvas_W,0,debug_canvas_W,debug_canvas_H,0,debug_canvas_H)
+    LTsv_drawtk_color("white"); LTsv_drawtk_polygonfill(0,0,debug_kanzip_DLprogres_WH,0,debug_kanzip_DLprogres_WH,debug_kanzip_DLprogres_WH,0,debug_kanzip_DLprogres_WH)
     mouse_x,mouse_y=LTsv_global_canvasmotionX(),LTsv_global_canvasmotionY()
-    LTsv_draw_color(debug_keysetup_canvas,draw_k="text",draw_t="mouseX,Y\n[{0},{1}]".format(mouse_x,mouse_y),draw_x=mouse_x,draw_y=mouse_y,draw_c=debug_scaleRGB,draw_f=debug_font_entry)
-    LTsv_putdaytimenow()
-    LTsv_checkFPS()
-    LTsv_draw_color(debug_keysetup_canvas,draw_k="text",draw_t=LTsv_getdaytimestr(LTsv_widget_gettext(debug_keysetup_timentry)),draw_x=debug_kanzip_DLprogres_WH,draw_y=0,draw_c="black",draw_f=debug_font_entry)
+    LTsv_drawtk_color(debug_scaleRGB); LTsv_drawtk_text("mouseX,Y\n[{0},{1}]".format(mouse_x,mouse_y),draw_x=mouse_x,draw_y=mouse_y)
+    LTsv_putdaytimenow(); LTsv_checkFPS()
+    LTsv_drawtk_color("black"); LTsv_drawtk_text(LTsv_getdaytimestr(LTsv_widget_gettext(debug_keysetup_timentry)),draw_x=debug_kanzip_DLprogres_WH,draw_y=0)
     LTsv_setkbddata(25,0)
     kbdlabels=LTsv_getkbdlabels().replace('\t',' ').replace('た','\nた').replace('ち','\nち').replace('つ','\nつ').replace('NFER','\nNFER')
     if LTsv_joymax > 0:
-        LTsv_setjoydata(0)
-        pad_axis=LTsv_readlinerest(LTsv_getjoystr(0),LTsv_joyaxis_label())
-        for pad_xy,pad_polygon in enumerate(debug_joypad_polygon):
-            pad_x,pad_y=debug_joypad_X+pad_xy*debug_joypad_W,debug_joypad_Y
-            LTsv_draw_color(debug_keysetup_canvas,draw_k=pad_polygon,draw_x=pad_x,draw_y=pad_y,draw_w=debug_joypad_W,draw_h=debug_joypad_W,draw_c="black",draw_l=False)
+        LTsv_setjoydata(0); pad_axis=LTsv_readlinerest(LTsv_getjoystr(0),LTsv_joyaxis_label())
+    for pad_xy,pad_circle in enumerate([LTsv_drawtk_squares,LTsv_drawtk_circles,LTsv_drawtk_circles]):
+        pad_x,pad_y=debug_joypad_X+pad_xy*debug_joypad_W,debug_joypad_Y
+        pad_circle(debug_joypad_W,*(pad_x,pad_y))
+        if LTsv_joymax > 0:
             stick_w=int(LTsv_pickdatalabel(pad_axis,debug_padxkey[pad_xy]))
             stick_h=int(LTsv_pickdatalabel(pad_axis,debug_padykey[pad_xy]))
             stick_t=math.atan2(stick_w,stick_h)
             stick_s=LTsv_atanscalar(stick_w,stick_h)
-            LTsv_draw_color(debug_keysetup_canvas,draw_k="line",draw_x=pad_x,draw_y=pad_y,draw_w=int(math.sin(stick_t)*stick_s*debug_joypad_W/2/LTsv_WINJOYCENTER),draw_h=int(math.cos(stick_t)*stick_s*debug_joypad_W/2/LTsv_WINJOYCENTER),draw_c="black")
-            LTsv_draw_color(debug_keysetup_canvas,draw_k="text",draw_t="{0},{1}\n{2},{3}\nθ{4}\n∇{5}".format(debug_padxkey[pad_xy],debug_padykey[pad_xy],LTsv_pickdatalabel(pad_axis,debug_padxkey[pad_xy]),LTsv_pickdatalabel(pad_axis,debug_padykey[pad_xy]),stick_t,stick_s),draw_x=pad_x,draw_y=pad_y,draw_c="black",draw_f=debug_font_entry)
-        txt_y=debug_joypad_Y+debug_joypad_H//2
-        LTsv_draw_color(debug_keysetup_canvas,draw_k="text",draw_t=LTsv_getjoystr(0).replace('\t',' '),draw_x=0,draw_y=txt_y,draw_c="black",draw_f=debug_font_entry)
-    else:
-        for pad_xy,pad_polygon in enumerate(debug_joypad_polygon):
-            pad_x,pad_y=debug_joypad_X+pad_xy*debug_joypad_W,debug_joypad_Y
-            LTsv_draw_color(debug_keysetup_canvas,draw_k=pad_polygon,draw_x=pad_x,draw_y=pad_y,draw_w=debug_joypad_W,draw_h=debug_joypad_W,draw_c="black",draw_l=False)
-            LTsv_draw_color(debug_keysetup_canvas,draw_k="text",draw_t="{0},{1}".format(debug_padxkey[pad_xy],debug_padykey[pad_xy]),draw_x=pad_x,draw_y=pad_y,draw_c="black",draw_f=debug_font_entry)
-        txt_y=debug_joypad_Y+debug_joypad_H//2
-    LTsv_draw_color(debug_keysetup_canvas,draw_k="text",draw_t=kbdlabels,draw_x=0,draw_y=txt_y+debug_label_WH*3,draw_c="black",draw_f=debug_font_entry)
-    txt_x=pad_x
-    LTsv_draw_color(debug_keysetup_canvas,draw_k="text",draw_t="getkbdnames:"+LTsv_getkbdnames().replace('\t',' '),draw_x=txt_x,draw_y=txt_y+debug_label_WH*3,draw_c="black",draw_f=debug_font_entry)
-    LTsv_draw_color(debug_keysetup_canvas,draw_k="text",draw_t="getkbdcodes:"+LTsv_getkbdcodes().replace('\t',' '),draw_x=txt_x,draw_y=txt_y+debug_label_WH*4,draw_c="black",draw_f=debug_font_entry)
-    LTsv_draw_color(debug_keysetup_canvas,draw_k="text",draw_t="getkbdkanas:"+LTsv_getkbdkanas().replace('\t',' '),draw_x=txt_x,draw_y=txt_y+debug_label_WH*5,draw_c="black",draw_f=debug_font_entry)
-    LTsv_drawtk_selcanvas(debug_keysetup_canvas)
-    LTsv_drawtk_color(draw_c=debug_scaleRGB)
+            LTsv_drawtk_polygon(*(pad_x,pad_y,pad_x+int(math.sin(stick_t)*stick_s*debug_joypad_W/2/LTsv_WINJOYCENTER),pad_y+int(math.cos(stick_t)*stick_s*debug_joypad_W/2/LTsv_WINJOYCENTER)))
+            LTsv_drawtk_text("{0},{1}\n{2},{3}\nθ{4}\n∇{5}".format(debug_padxkey[pad_xy],debug_padykey[pad_xy],LTsv_pickdatalabel(pad_axis,debug_padxkey[pad_xy]),LTsv_pickdatalabel(pad_axis,debug_padykey[pad_xy]),stick_t,stick_s),draw_x=pad_x,draw_y=pad_y)
+        else:
+            LTsv_drawtk_text("{0},{1}".format(debug_padxkey[pad_xy],debug_padykey[pad_xy]),draw_x=pad_x,draw_y=pad_y)
+    debug_arc_W=debug_joypad_X+int(debug_joypad_W*2.5)
+    LTsv_drawtk_arc(debug_arc_W,debug_joypad_Y-debug_joypad_W//2,debug_canvas_W-debug_arc_W-2,debug_joypad_W,-math.pi*0.5,math.pi*1.8) #gdk_draw_arc
+    txt_x,txt_y=500,debug_joypad_Y+debug_joypad_H//2
+    if LTsv_joymax > 0:
+        LTsv_drawtk_text(LTsv_getjoystr(0).replace('\t',' '),draw_x=0,draw_y=txt_y)
+    LTsv_drawtk_text(kbdlabels,draw_x=0,draw_y=txt_y+debug_label_WH*3)
+    LTsv_drawtk_text("getkbdnames:{0}".format(LTsv_getkbdnames()),draw_x=txt_x,draw_y=txt_y+debug_label_WH*1)
+    LTsv_drawtk_text("getkbdcodes:{0}".format(LTsv_getkbdcodes()),draw_x=txt_x,draw_y=txt_y+debug_label_WH*2)
+    LTsv_drawtk_text("getkbdkanas:{0}".format(LTsv_getkbdkanas()),draw_x=txt_x,draw_y=txt_y+debug_label_WH*3)
+    LTsv_drawtk_color(debug_scaleRGB)
     LTsv_drawtk_polygon(*tuple(debug_polygonpointlist))
+    if LTsv9_logoOBJ:
+        LTsv_drawtk_picture(LTsv9_logoPATH,debug_canvas_W-LTsv_global_pictureW(LTsv9_logoPATH),debug_canvas_H-LTsv_global_pictureH(LTsv9_logoPATH))
     LTsv_draw_queue(debug_keysetup_canvas)
     LTsv_window_after(debug_keysetup_window,event_b=debug_canvas,event_i="debug_canvas",event_w=50)
 
@@ -1737,7 +1668,6 @@ if __name__=="__main__":
         debug_scale_X,debug_scale_Y,debug_scale_W,debug_scale_H=debug_canvas_W,debug_canvas_Y+debug_combobox_H,debug_keysetup_W-debug_canvas_W,debug_canvas_H-debug_combobox_H
         debug_joypad_X,debug_joypad_Y,debug_joypad_W,debug_joypad_H=debug_canvas_W//6,debug_canvas_H*1//4+debug_label_WH*2,debug_canvas_H*2//4,debug_canvas_H*2//4
         debug_padxkey,debug_padykey=["Px","Lx","Rx"],["Py","Ly","Ry"]
-        debug_joypad_polygon=["square","circle","circle"]
         debug_keyspin_X,debug_keyspin_Y,debug_keyspin_W,debug_keyspin_H=0,debug_keysetup_H-debug_label_WH*9,debug_keysetup_W//14,debug_label_WH
         debug_keysetup_window=LTsv_window_new(widget_t="L:Tsv GUI test and KeyCode Setup",event_b=LTsv_window_exit,widget_w=debug_keysetup_W,widget_h=debug_keysetup_H)
         debug_timentry_default="@000y年-@0m月(@0wnyi/@ywi週)-@0dm日(@wdj曜)@0h:@0n:@0s FPS:@0fpc"
@@ -1745,9 +1675,12 @@ if __name__=="__main__":
         debug_keysetup_timebutton=LTsv_button_new(debug_keysetup_window,widget_t="reset",widget_x=debug_keysetup_W-debug_keyspin_W*1,widget_y=0,widget_w=debug_keyspin_W*1,widget_h=debug_label_WH,widget_f=debug_font_entry,event_b=debug_timebutton)
         debug_keysetup_canvas=LTsv_canvas_new(debug_keysetup_window,widget_x=debug_canvas_X,widget_y=debug_canvas_Y,widget_w=debug_canvas_W,widget_h=debug_canvas_H,event_w=50,event_p=debug_canvas_press)
         if LTsv_GUI == LTsv_GUI_GTK2:
-            LTsv_drawtk_selcanvas,LTsv_drawtk_color,LTsv_drawtk_polygon=LTsv_drawGTK_selcanvas,LTsv_drawGTK_color,LTsv_drawGTK_polygon
+            LTsv_drawtk_selcanvas,LTsv_drawtk_color,LTsv_drawtk_font,LTsv_drawtk_text,LTsv_drawtk_picture=LTsv_drawGTK_selcanvas,LTsv_drawGTK_color,LTsv_drawGTK_font,LTsv_drawGTK_text,LTsv_drawGTK_picture
+            LTsv_drawtk_polygon,LTsv_drawtk_polygonfill,LTsv_drawtk_squares,LTsv_drawtk_circles,LTsv_drawtk_arc=LTsv_drawGTK_polygon,LTsv_drawGTK_polygonfill,LTsv_drawGTK_squares,LTsv_drawGTK_circles,LTsv_drawGTK_arc
         if LTsv_GUI == LTsv_GUI_Tkinter:
-            LTsv_drawtk_selcanvas,LTsv_drawtk_color,LTsv_drawtk_polygon=LTsv_drawTkinter_selcanvas,LTsv_drawTkinter_color,LTsv_drawTkinter_polygon
+            LTsv_drawtk_selcanvas,LTsv_drawtk_color,LTsv_drawtk_font,LTsv_drawtk_text,LTsv_drawtk_picture=LTsv_drawTkinter_selcanvas,LTsv_drawTkinter_color,LTsv_drawTkinter_font,LTsv_drawTkinter_text,LTsv_drawTkinter_picture
+            LTsv_drawtk_polygon,LTsv_drawtk_polygonfill,LTsv_drawtk_squares,LTsv_drawtk_circles,LTsv_drawtk_arc=LTsv_drawTkinter_polygon,LTsv_drawTkinter_polygonfill,LTsv_drawTkinter_squares,LTsv_drawTkinter_circles,LTsv_drawTkinter_arc
+        LTsv9_logoPATH="../icon/LTsv9_logo.png"; LTsv9_logoOBJ=LTsv_draw_picture_load(LTsv9_logoPATH)
         debug_polygonpointlist=[1, 1, 28, 1, 28, 8, 18, 8, 18, 10, 28, 10, 28, 17, 18, 17, 18, 28, 11, 28, 11, 17, 1, 17, 1, 10, 11, 10, 11, 8, 1, 8]
         debug_kanzip_DLprogres_WH=30
         debug_keysetup_scaleR=LTsv_scale_new(debug_keysetup_window,widget_x=debug_scale_X+debug_scale_W*0//3,widget_y=debug_scale_Y,widget_w=debug_scale_W//3,widget_h=debug_scale_H,widget_s=0,widget_e=255,widget_a=1,event_b=debug_color_scale)
@@ -1806,7 +1739,7 @@ if __name__=="__main__":
     else:
         LTsv_libc_printf("GUIの設定に失敗しました。")
     print("")
-    print("__main__",LTsv_gui_ver())
+    print("__main__",LTsv_file_ver())
 
 
 # Copyright (c) 2016 ooblog
