@@ -22,10 +22,21 @@ sensors&#40;lm&#95;sensors&#41;コマンドを使えるようにしておくこ�
 
 「[sensortray.tsv](sensortray.tsv)」の「tempO」「tempC」項目の検索文字列を書き換えて誤差を吸収してください。  
 
+
 ## 操作方法。
 
 通知タスクトレイ&#40;Notify&#41;左クリック→アイコン点滅条件の数値設定ウィンドウ表示。  
 通知タスクトレイ&#40;Notify&#41;右クリック→数値設定初期化。  
+
+
+## アイコン「sensorC.icl」関連&#40;Windows&#41;。
+
+付録の「celdivsave.py」は「sensorC.png」を分割して「sensorC.icl」を作る過程で作ったツールです。  
+「sensorC&#91;&#63;&#63;&#93;.png」をアイコンDLL「sensorC.icl」に変換するには別途Windows系のソフトが必要です。  
+[複数のアイコンを簡単にICL/DLLファイルへまとめられる「アイコンパッキング」](http://www.forest.impress.co.jp/docs/review/20130822_612100.html)
+>「アイコンパッキング」は、複数のICO形式のアイコンファイルを簡単に  
+>1つのICL/DLLファイルへまとめられるソフト。  
+
 
 ## 動作環境。
 
@@ -34,13 +45,6 @@ Windowsでは以下の２点で起動はすれど動作しません。
 1.Tkinterで通知タスクトレイ&#40;Notify&#41;クリックからのポップアップメニュー出現方法が不明。  
 2.そもそもWindowsでCPU温度を所得する方法が不明。  
 
-## アイコン「sensorC.icl」の置き換え関連&#40;Windows&#41;。
-
-付録の「celdivsave.py」は「sensorC.png」を分割して「sensorC.icl」を作る過程で作ったツールです。  
-「sensorC&#91;&#63;&#63;&#93;.png」をアイコンDLL「sensorC.icl」に変換するには別途Windows系のソフトが必要です。  
-[複数のアイコンを簡単にICL/DLLファイルへまとめられる「アイコンパッキング」](http://www.forest.impress.co.jp/docs/review/20130822_612100.html)
->「アイコンパッキング」は、複数のICO形式のアイコンファイルを簡単に  
->1つのICL/DLLファイルへまとめられるソフト。  
 
 ## ライセンス・著作権など。
 

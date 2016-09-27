@@ -96,7 +96,7 @@ def sensortray_exit_before(window_objvoid=None,window_objptr=None):
     LTsv_window_exit()
 sensortray_exit_before_cbk=LTsv_CALLBACLTYPE(sensortray_exit_before)
 
-LTsv_GUI=LTsv_guiinit(LTsv_GUI_Tkinter)
+LTsv_GUI=LTsv_guiinit()
 if len(LTsv_GUI) > 0:
     if LTsv_global_Notify() == LTsv_GUI_GTK2:
        sensor_window=LTsv_window_new(event_b=None,widget_t="sensortray",widget_w=sensor_windowW,widget_h=sensor_windowH)
