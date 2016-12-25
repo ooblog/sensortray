@@ -98,8 +98,9 @@ sensortray_exit_before_cbk=LTsv_CALLBACLTYPE(sensortray_exit_before)
 
 LTsv_GUI=LTsv_guiinit()
 if len(LTsv_GUI) > 0:
+    LTsv_hideondelete=LTsv_hideondelete_shell()
     if LTsv_global_Notify() == LTsv_GUI_GTK2:
-       sensor_window=LTsv_window_new(event_b=None,widget_t="sensortray",widget_w=sensor_windowW,widget_h=sensor_windowH)
+       sensor_window=LTsv_window_new(event_b=LTsv_hideondelete,widget_t="sensortray",widget_w=sensor_windowW,widget_h=sensor_windowH)
     if LTsv_global_Notify() == LTsv_GUI_WinAPI:
         sensor_window=LTsv_window_new(event_b=sensortray_exit_before,widget_t="sensortray",widget_w=sensor_windowW,widget_h=sensor_windowH)
 

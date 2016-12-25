@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import division,print_function,absolute_import,unicode_literals
 import sys
+import locale
 import subprocess
 import codecs
 import ctypes
@@ -10,6 +11,7 @@ if sys.version_info.major == 2:
     import htmlentitydefs
 if sys.version_info.major == 3:
     import html.entities
+LTsv_name2codepoint=html.entities.name2codepoint if sys.version_info.major == 3 else htmlentitydefs.name2codepoint
 LTsv_chrcode=chr if sys.version_info.major == 3 else unichr
 
 LTsv_libc=None
@@ -22,9 +24,17 @@ if sys.platform.startswith("linux"):
 #if sys.platform.startswith("darwin"):
 #    LTsv_libc=ctypes.CDLL("libSystem.B.dylib")
 
+def LTsv_getpreferredencoding():
+    LTsv_stdout=sys.stdout.encoding
+    if LTsv_stdout is None:
+        LTsv_stdout=locale.getpreferredencoding();
+#        print("LTsv_getpreferredencoding",LTsv_stdout)
+    return LTsv_stdout
+
 def LTsv_libc_printf(LTsv_text,LTsv_log=None):
     if not LTsv_libc is None:
-        LTsv_Btext=LTsv_text.encode(sys.stdout.encoding,"xmlcharrefreplace")
+#        LTsv_Btext=LTsv_text.encode(sys.stdout.encoding,"xmlcharrefreplace")
+        LTsv_Btext=LTsv_text.encode(LTsv_getpreferredencoding(),"xmlcharrefreplace")
         LTsv_libc.printf(b"%s\n",LTsv_Btext)
     else:
         print(LTsv_text)
@@ -41,9 +51,11 @@ def LTsv_libc_printcat(LTsv_text):
         LTsv_Btext=LTsv_text.encode(sys.stdout.encoding,"xmlcharrefreplace")
         LTsv_libc.printf(b"%s",LTsv_Btext)
 
-def LTsv_libc_printf_type(LTsv_text):
-    Btext=LTsv_text.encode(sys.stdout.encoding,"xmlcharrefreplace")
-    LTsv_libc_printf("{0} {1}".format(type(Btext),[Btext]))
+def LTsv_libc_printf_type(LTsv_text,LTsv_log=None):
+#    Btext=LTsv_text.encode(sys.stdout.encoding,"xmlcharrefreplace")
+    LTsv_Btext=LTsv_text.encode(LTsv_getpreferredencoding(),"xmlcharrefreplace")
+    LTsv_page=LTsv_libc_printf("{0} {1}".format(type(LTsv_Btext),[LTsv_Btext]),LTsv_log)
+    return LTsv_page
 
 def LTsv_utf2xml(LTsv_text):
     LTsv_xmltext=""
@@ -58,7 +70,7 @@ def LTsv_xml2utf(LTsv_text):
             LTsv_unicharcode=int("0"+LTsv_unichar.lstrip("&#").rstrip(";"),16) if LTsv_unichar[2] in ('x','X') else int(LTsv_unichar.lstrip("&#").rstrip(";"))
             LTsv_utftext=LTsv_utftext.replace(LTsv_unichar,LTsv_chrcode(LTsv_unicharcode))
         else:
-            LTsv_unicharcode=htmlentitydefs.name2codepoint.get(LTsv_unichar.lstrip("&").rstrip(";"))
+            LTsv_unicharcode=LTsv_name2codepoint.get(LTsv_unichar.lstrip("&").rstrip(";"))
             LTsv_utftext=LTsv_utftext.replace(LTsv_unichar,LTsv_chrcode(LTsv_unicharcode)) if not LTsv_unicharcode is None else LTsv_utftext
 #    if sys.version_info.major == 2:
 #        for LTsv_unichar in re.findall(re.compile("&[/#a-zA-Z0-9]+?;"),LTsv_text):
@@ -154,14 +166,14 @@ LTsv_INKFF=10240+0xff     #⣿
 def LTsv_utf2ink(LTsv_text):
     LTsv_inktext=""
     LTsv_Btext=LTsv_text.encode("UTF-8","ignore")
-    for LTsv_unicode in LTsv_Btext:
-        LTsv_inktext+=LTsv_chrcode(LTsv_INK00+ord(LTsv_unicode))
-#    if sys.version_info.major == 2:
-#        for LTsv_unicode in LTsv_Btext:
-#            LTsv_inktext+=unichr(LTsv_INK00+ord(LTsv_unicode))
-#    if sys.version_info.major == 3:
-#        for LTsv_unicode in LTsv_Btext:
-#            LTsv_inktext+=chr(LTsv_INK00+LTsv_unicode)
+#    for LTsv_unicode in LTsv_Btext:
+#        LTsv_inktext+=LTsv_chrcode(LTsv_INK00+ord(LTsv_unicode))
+    if sys.version_info.major == 2:
+        for LTsv_unicode in LTsv_Btext:
+            LTsv_inktext+=unichr(LTsv_INK00+ord(LTsv_unicode))
+    if sys.version_info.major == 3:
+        for LTsv_unicode in LTsv_Btext:
+            LTsv_inktext+=chr(LTsv_INK00+LTsv_unicode)
     return LTsv_inktext
 
 def LTsv_ink2utf(LTsv_text):
@@ -216,35 +228,51 @@ def LTsv_subprocess(LTsv_subprocess_input="",LTsv_subprocess_shell=False):
         LTsv_subprocess_output=err.output if err.output != None else ""
     return LTsv_subprocess_output
 
+def LTsv_otherprocess(LTsv_otherprocess_input=""):
+    LTsv_subprocess_output=""
+    try:
+        if sys.version_info.major == 2:
+            LTsv_otherprocess_proc=subprocess.Popen(LTsv_otherprocess_input.decode("utf-8"),shell=True)
+        if sys.version_info.major == 3:
+            LTsv_otherprocess_proc=subprocess.Popen(LTsv_otherprocess_input,shell=True)
+    except subprocess.CalledProcessError as err:
+#        print("subprocess.CalledProcessError({0}):{1}".format(err.returncode,err.output))
+        pass
+    return LTsv_otherprocess_proc
+
 
 if __name__=="__main__":
     from LTsv_file   import *
     print("__main__ Python{0.major}.{0.minor}.{0.micro},{1},{2}".format(sys.version_info,sys.platform,sys.stdout.encoding))
     print("")
-    print("hello world",type("hello world"))
-    print("'hello world'.encode('utf-8')",type("hello world".encode('utf-8')))
-    print("'hello {0}'.format('world')",type("hello world".format('world')))
+    test_workdir="./testfile/"; txtpath=test_workdir+"testprint.txt"; printlog=""
+    printlog=LTsv_libc_printf("'hello world' {0}".format(type("hello world")),printlog)
+    printlog=LTsv_libc_printf("'hello world'.encode('utf-8') {0}".format(type('hello world'.encode('utf-8'))),printlog)
+    printlog=LTsv_libc_printf("'hello {0}'.format('world') {1}".format("{0}",type('hello {0}'.format('world'))),printlog)
     print("")
     LTsv_helloworld="helloワールド\u5496\u55B1"
-    LTsv_libc_printf(LTsv_helloworld[0:5])
-    LTsv_libc_printf_type(LTsv_helloworld[0:5])
+    printlog=LTsv_libc_printf(LTsv_helloworld[0:5],printlog)
+    printlog=LTsv_libc_printf_type(LTsv_helloworld[0:5],printlog)
     print("")
-    LTsv_libc_printf(LTsv_helloworld[0:9])
-    LTsv_libc_printf_type(LTsv_helloworld[0:9])
+    printlog=LTsv_libc_printf(LTsv_helloworld[0:9],printlog)
+    printlog=LTsv_libc_printf_type(LTsv_helloworld[0:9],printlog)
     print("")
-    LTsv_libc_printf(LTsv_helloworld[5:11])
-    LTsv_libc_printf_type(LTsv_helloworld[5:11])
+    printlog=LTsv_libc_printf(LTsv_helloworld[5:11],printlog)
+    printlog=LTsv_libc_printf_type(LTsv_helloworld[5:11],printlog)
     print("")
     print("")
-    LTsv_xmltext=LTsv_utf2xml(LTsv_helloworld); LTsv_libc_printf("LTsv_utf2xml('{0}')↓\n{1}".format(LTsv_helloworld,LTsv_utf2xml(LTsv_helloworld)))
+    LTsv_xmltext=LTsv_utf2xml(LTsv_helloworld)
+    printlog=LTsv_libc_printf("LTsv_utf2xml('{0}')↓\n{1}".format(LTsv_helloworld,LTsv_utf2xml(LTsv_helloworld)),printlog)
     print("")
-    LTsv_xmltext+="&copy;&hoge;"; LTsv_libc_printf("LTsv_xmltext+='&copy;&hoge;'→{0}".format(LTsv_xmltext))
+    LTsv_xmltext+="&copy;&hoge;"
+    printlog=LTsv_libc_printf("LTsv_xmltext+='&copy;&hoge;'→{0}".format(LTsv_xmltext),printlog)
     print("")
-    LTsv_libc_printf("LTsv_xml2utf(LTsv_xmltext)↓\n{0}".format(LTsv_xml2utf(LTsv_xmltext)))
+    printlog=LTsv_libc_printf("LTsv_xml2utf(LTsv_xmltext)↓\n{0}".format(LTsv_xml2utf(LTsv_xmltext)),printlog)
     print("")
-    LTsv_inktext=LTsv_utf2ink(LTsv_helloworld); LTsv_libc_printf("LTsv_utf2ink('{0}')↓\n{1}".format(LTsv_helloworld,LTsv_utf2ink(LTsv_helloworld)))
+    LTsv_inktext=LTsv_utf2ink(LTsv_helloworld)
+    printlog=LTsv_libc_printf("LTsv_utf2ink('{0}')↓\n{1}".format(LTsv_helloworld,LTsv_utf2ink(LTsv_helloworld)),printlog)
     print("")
-    LTsv_libc_printf("LTsv_ink2utf('{0}')↓\n{1}".format(LTsv_inktext,LTsv_ink2utf(LTsv_inktext)))
+    printlog=LTsv_libc_printf("LTsv_ink2utf('{0}')↓\n{1}".format(LTsv_inktext,LTsv_ink2utf(LTsv_inktext)),printlog)
     print("")
     print("")
     kanarecases_order=["Hira2Kata","Kata2Hira","HiraKana2SeiH","HiraKana2SeiM","HiraKana2DakB","HiraKana2DakP","HiraKana2Han","HiraKana2HanKaKe","Han2HiraEz","Han2KataEz","Han2Hira","Han2Kata",
@@ -257,7 +285,8 @@ if __name__=="__main__":
         else:
             kanare_value=''.join(sorted(LTsv_kanarecases[kanare_key].keys()))
         kanare_replace=LTsv_kanare(kanare_value,kanare_key)
-        LTsv_libc_printf("LTsv_kanare(kanare_value,'{0}')\n{1}↓\n{2}\n".format(kanare_key,kanare_value,kanare_replace))
+        printlog=LTsv_libc_printf("LTsv_kanare(kanare_value,'{0}')\n{1}↓\n{2}\n".format(kanare_key,kanare_value,kanare_replace),printlog)
+    LTsv_saveplain(txtpath,printlog); LTsv_libc_printf("LTsv_savefile('{0}',printlog)".format(txtpath))
     print("")
     print("__main__",LTsv_file_ver())
 

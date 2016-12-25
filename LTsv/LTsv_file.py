@@ -8,6 +8,7 @@ if sys.version_info.major == 2:
 if sys.version_info.major == 3:
     import urllib.request
 import zipfile
+import base64
 import datetime
 import re
 from LTsv_time import *
@@ -55,34 +56,35 @@ def LTsv_zipload(LTsv_zip,LTsv_name,LTsv_path):
             with open(LTsv_path,'wb') as LTsv_fobj:
                 LTsv_fobj.write(LTsv_ZipFile.read(LTsv_nameLU))
 
-def LTsv_loadfile(LTsv_path,LTsv_default=None):
-    LTsv_text="" if LTsv_default is None else LTsv_default
+def LTsv_64load(LTsv_path,LTsv_codewidth=128):
+    LTsv_text=""
     if os.path.isfile(LTsv_path):
-        if os.path.getsize(LTsv_path)!=len(LTsv_text.encode('utf-8')):
-            if sys.version_info.major == 2:
-                with open(LTsv_path,"r") as LTsv_fobj:
-                    LTsv_byte=LTsv_fobj.read()
-                LTsv_text=unicode(LTsv_byte,"utf-8",errors="xmlcharrefreplace")
-            if sys.version_info.major == 3:
-                with open(LTsv_path,mode="r",encoding="utf-8",errors="xmlcharrefreplace") as LTsv_fobj:
-                    LTsv_text=LTsv_fobj.read()
-            if not LTsv_text.endswith('\n'):
-                LTsv_text+='\n'
+        if sys.version_info.major == 2:
+            with open(LTsv_path,"rt") as LTsv_fobj:
+                LTsv_byte=LTsv_fobj.read()
+            LTsv_text=base64.b64encode(LTsv_byte)
+        if sys.version_info.major == 3:
+            with open(LTsv_path,"rb") as LTsv_fobj:
+                LTsv_byte=LTsv_fobj.read()
+            LTsv_text=base64.b64encode(LTsv_byte).decode('utf-8')
+    LTsv_data=[LTsv_text[t*LTsv_codewidth:t*LTsv_codewidth+LTsv_codewidth] for t in range(len(LTsv_text)//max(LTsv_codewidth,1)+1)]
+    LTsv_text='\n'.join(LTsv_data)
     return LTsv_text
 
-def LTsv_loadcp932file(LTsv_path,LTsv_default="cp932"):
-    LTsv_text=""
+def LTsv_loadfile(LTsv_path,LTsv_encoding="utf-8",LTsv_default=None):  #SJIS:LTsv_encoding="cp932"
+    LTsv_text="" if LTsv_default == None else LTsv_default
     if os.path.isfile(LTsv_path):
         if sys.version_info.major == 2:
             with open(LTsv_path,"r") as LTsv_fobj:
                 LTsv_byte=LTsv_fobj.read()
-            LTsv_text=unicode(LTsv_byte,LTsv_default,errors="xmlcharrefreplace")
+            LTsv_text=unicode(LTsv_byte,LTsv_encoding,errors="xmlcharrefreplace")
         if sys.version_info.major == 3:
-            with open(LTsv_path,mode="r",encoding=LTsv_default,errors="xmlcharrefreplace") as LTsv_fobj:
+            with open(LTsv_path,mode="r",encoding=LTsv_encoding,errors="xmlcharrefreplace") as LTsv_fobj:
                 LTsv_text=LTsv_fobj.read()
         if not LTsv_text.endswith('\n'):
             LTsv_text+='\n'
     return LTsv_text
+
 
 def LTsv_readlinepages(LTsv_text):
     LTsv_line=""
@@ -93,8 +95,8 @@ def LTsv_readlinepages(LTsv_text):
 
 def LTsv_getpage(LTsv_text,LTsv_tag,LTsv_default=None):
     LTsv_page="" if LTsv_default is None else LTsv_default
-    LTsv_tagL="[{0}|\n".format(LTsv_tag); LTsv_tagR="|{0}]\n".format(LTsv_tag)
-    if len(LTsv_tag) > 0:
+    if len(LTsv_tag) > 0 and not '\n' in LTsv_tag:
+        LTsv_tagL="[{0}|\n".format(LTsv_tag); LTsv_tagR="|{0}]\n".format(LTsv_tag)
         LTsv_posL=LTsv_text.find(LTsv_tagL); LTsv_posR=LTsv_text.find(LTsv_tagR)
         if 0 <= LTsv_posL < LTsv_posR <= len(LTsv_text):
             LTsv_page=LTsv_text[LTsv_posL+len(LTsv_tagL):LTsv_posR]
@@ -123,7 +125,7 @@ def LTsv_readlinefirsts(LTsv_text):
         if LTsv_posR >= 0:
             LTsv_line+='\t'+LTsv_split[0:LTsv_posR]
         else:
-            LTsv_posR=LTsv_split
+             LTsv_line+='\t'+LTsv_split
     LTsv_line=LTsv_line.lstrip('\t')
     return LTsv_line
 
@@ -317,12 +319,12 @@ def LTsv_pushlinerest(LTsv_page,LTsv_first,LTsv_default=None):
 
 def LTsv_putpage(LTsv_text,LTsv_tag,LTsv_default=None):
     LTsv_page="" if LTsv_default is None else LTsv_default
-    LTsv_join=LTsv_text; LTsv_tagL="[{0}|\n".format(LTsv_tag); LTsv_tagR="|{0}]\n".format(LTsv_tag);
     if LTsv_default != None:
         if len(LTsv_page) > 0:
             if not LTsv_page.endswith('\n'):
                 LTsv_page+='\n'
-    if len(LTsv_tag) > 0:
+    LTsv_join=LTsv_text; LTsv_tagL="[{0}|\n".format(LTsv_tag); LTsv_tagR="|{0}]\n".format(LTsv_tag);
+    if len(LTsv_tag) > 0 and not '\n' in LTsv_tag:
         LTsv_posL=LTsv_text.find(LTsv_tagL); LTsv_posR=LTsv_text.find(LTsv_tagR)
         if 0 <= LTsv_posL < LTsv_posR <= len(LTsv_text):
             if LTsv_default != None:
@@ -449,28 +451,19 @@ def LTsv_tuple2tsv(LTsv_tuple):
 #        LTsv_line="{0}{1}\t".format(LTsv_line,LTsv_data)
 #    return LTsv_line.rstrip('\t')
 
-def LTsv_tsv2list(LTsv_line):
+def LTsv_tsv2list(LTsv_line,LTsv_len=None):
     LTsv_list=LTsv_line.replace('\n','\t').strip('\t').split('\t')
+    if LTsv_len != None:
+        LTsv_listcount=[""]*LTsv_len
+        for LTsv_count,LTsv_data in enumerate(LTsv_list):
+            if LTsv_count >= LTsv_len: break;
+            LTsv_listcount[LTsv_count]=LTsv_data
+        LTsv_list=LTsv_listcount
     return LTsv_list
 
-def LTsv_tsv2tuple(LTsv_line):
-    LTsv_tuple=tuple(LTsv_tsv2list(LTsv_line))
+def LTsv_tsv2tuple(LTsv_line,LTsv_len=None):
+    LTsv_tuple=tuple(LTsv_tsv2list(LTsv_line,LTsv_len))
     return LTsv_tuple
-
-def LTsv_intstr0x(LTsv_codestr):
-    LTsv_codeint=0
-    try:
-        LTsv_codeint=int(float(LTsv_codestr))
-    except ValueError:
-        pass
-    for LTsv_hexstr in ["0x","$"]:
-        if LTsv_hexstr in LTsv_codestr:
-            try:
-                LTsv_codeint=int(LTsv_codestr.replace(LTsv_hexstr,""),16)
-            except ValueError:
-                pass
-            break
-    return LTsv_codeint
 
 def LTsv_label2dictint(LTsv_line):
     LTsv_labels=""; LTsv_datas=""; LTsv_dict={}
@@ -505,7 +498,7 @@ def LTsv_dict2label(LTsv_dict):
     return LTsv_line.rstrip('\t')
 
 def LTsv_file_ver():
-    return "20160718M003911"
+    return "20161215R220253"
 
 def LTsv_issue():
     LTsv_issuefile=""
@@ -517,19 +510,20 @@ if __name__=="__main__":
     from LTsv_printf import *
     print("__main__ Python{0.major}.{0.minor}.{0.micro},{1},{2}".format(sys.version_info,sys.platform,sys.stdout.encoding))
     print("")
-    test_workdir="./testfile/"
-    tsvpath=test_workdir+"testfile.tsv"; txtpath=test_workdir+"testfile.txt"; printlog=""
-    newfile=LTsv_newfile('__name__=="__main__"',"LTsv8Py"); printlog=LTsv_libc_printf("LTsv_newfile('LTsv8Py')↓\n{0}-eof-".format(newfile),printlog)
-    newfile=LTsv_putpage(newfile,"LTsv8Py","stdout\tHelloワールド\u5496\u55B1")
-    newpage=LTsv_getpage(newfile,"LTsv8Py")
+    test_workdir="./testfile/"; tsvpath=test_workdir+"testfile.tsv"; txtpath=test_workdir+"testfile.txt"; printlog=""
+    newfile=LTsv_newfile('__name__=="__main__"',"LTsv10kanedit"); printlog=LTsv_libc_printf("LTsv_newfile('LTsv10kanedit')↓\n{0}-eof-".format(newfile),printlog)
+    newfile=LTsv_putpage(newfile,"LTsv10kanedit","stdout\tHelloワールド\u5496\u55B1")
+    newpage=LTsv_getpage(newfile,"LTsv10kanedit")
     newpage=LTsv_pushlinerest(newpage,"tsvtool","print\nfile\ntime\njoy\nkbd\ngui\nsdl")
     newpage=LTsv_pushlinerest(newpage,"tstfile","before:testfile.tsv\tafter:testfile.txt\treadme:readme.txt")
-    newfile=LTsv_putpage(newfile,"LTsv8Py",newpage)
+    newfile=LTsv_putpage(newfile,"LTsv10kanedit",newpage)
     LTsv_savefile(tsvpath,newfile); printlog=LTsv_libc_printf("LTsv_savefile('{0}',newfile)".format(tsvpath),printlog)
-    loadfile=LTsv_loadfile(tsvpath,newfile); printlog=LTsv_libc_printf("LTsv_loadfile(tsvpath)↓\n{0}-eof-".format(loadfile),printlog)
+    loadfile=LTsv_loadfile(tsvpath); printlog=LTsv_libc_printf("LTsv_loadfile(tsvpath)↓\n{0}-eof-".format(loadfile),printlog)
+    iconbase64=LTsv_64load('../docs/LTsv10_logo.png',100); printlog=LTsv_libc_printf("LTsv_64load('../docs/LTsv10_logo.png',100)↓\ndata:image/png;base64,\n{0}".format(iconbase64),printlog)
+    print("")
     print("")
     pages=LTsv_readlinepages(loadfile); printlog=LTsv_libc_printf("LTsv_readlinepages(loadfile)↓\n{0}".format(pages),printlog)
-    getpage=LTsv_getpage(loadfile,"LTsv8Py"); printlog=LTsv_libc_printf("LTsv_getpage(loadfile,'LTsv8Py')↓\n{0}-eop-".format(getpage),printlog)
+    getpage=LTsv_getpage(loadfile,"LTsv10kanedit"); printlog=LTsv_libc_printf("LTsv_getpage(loadfile,'LTsv10kanedit')↓\n{0}-eop-".format(getpage),printlog)
     firsts=LTsv_readlinefirsts(getpage); printlog=LTsv_libc_printf("LTsv_readlinefirsts(getpage)↓\n{0}".format(firsts),printlog)
     printlog=LTsv_libc_printf("LTsv_pickdatadeno(firsts)→{0}".format(LTsv_pickdatadeno(firsts)),printlog)
     printlog=LTsv_libc_printf("LTsv_pickdatafind(firsts,'tsvtool')→{0}".format(LTsv_pickdatafind(firsts,'tsvtool')),printlog)
@@ -559,8 +553,8 @@ if __name__=="__main__":
     print("")
     readline=LTsv_readlinerest(getpage,"tstfile"); printlog=LTsv_libc_printf("LTsv_readlinerest(getpage,'tstfile')↓\n{0}".format(readline),printlog)
     printlog=LTsv_libc_printf("LTsv_pickdatalabel(readline,'after')→{0}".format(LTsv_pickdatalabel(readline,"after")),printlog)
-    printlog=LTsv_libc_printf("LTsv_setdatalabel(readline,'icon','LTsv8Py_logo.png')↓\n{0}".format(LTsv_setdatalabel(readline,"icon","LTsv8Py_logo.png.png")),printlog)
-    printlog=LTsv_libc_printf("LTsv_setdatalabel(readline,'after','LTsv8Py.png')↓\n{0}".format(LTsv_setdatalabel(readline,"after","LTsv8Py.png")),printlog)
+    printlog=LTsv_libc_printf("LTsv_setdatalabel(readline,'icon','LTsv10kanedit_logo.png')↓\n{0}".format(LTsv_setdatalabel(readline,"icon","LTsv10kanedit_logo.png")),printlog)
+    printlog=LTsv_libc_printf("LTsv_setdatalabel(readline,'after','LTsv10kanedit.png')↓\n{0}".format(LTsv_setdatalabel(readline,"after","LTsv10kanedit.png")),printlog)
     printlog=LTsv_libc_printf("LTsv_setdatalabel(readline,'after','')↓\n{0}".format(LTsv_setdatalabel(readline,"after",'')),printlog)
     printlog=LTsv_libc_printf("LTsv_setdatalabel(readline,'after')↓\n{0}".format(LTsv_setdatalabel(readline,"after")),printlog)
     print("")
@@ -590,6 +584,10 @@ if __name__=="__main__":
     printlog=LTsv_libc_printf("LTsv_tsv2tuple(joylabel)↓\n{0}".format(joytuple),printlog)
     joylist=LTsv_tsv2list(joylabel)
     printlog=LTsv_libc_printf("LTsv_tsv2list(joylabel)↓\n{0}".format(joylist),printlog)
+    unpackX,unpackY,unpackA,unpackB=LTsv_tsv2list(joylabel,4)
+    printlog=LTsv_libc_printf("unpackX,unpackY,unpackA,unpackB=LTsv_tsv2list(joylabel,4)↓\n{0},{1},{2},{3}".format(unpackX,unpackY,unpackA,unpackB),printlog)
+    unpackX,unpackY,unpackA,unpackB,unpackC,unpackZ,unpackL,unpackR,unpackF,unpackJ=LTsv_tsv2list(joylabel,10)
+    printlog=LTsv_libc_printf("unpackX,unpackY,unpackA,unpackB,unpackC,unpackZ,unpackL,unpackR,unpackF,unpackJ=LTsv_tsv2list(joylabel,10)↓\n{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}".format(unpackX,unpackY,unpackA,unpackB,unpackC,unpackZ,unpackL,unpackR,unpackF,unpackJ),printlog)
     joylabel=LTsv_tuple2tsv(joytuple)
     printlog=LTsv_libc_printf("LTsv_tuple2tsv(joytuple)↓\n{0}".format(joylabel),printlog)
     joylabel=LTsv_tuple2tsv(joylist)

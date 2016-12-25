@@ -20,18 +20,6 @@ try:
 #    import messagebox as Tk_mb
 except:
     LTsv_Tkinter=False
-#if LTsv_Tkinter == False:
-#    #http://shinobar.server-on.net/puppy/opt/tcl_tk-8.5.7-1-p4.sfs
-#    if os.path.exists("/usr/lib/python3.4"):
-#        sys.path.append("/usr/lib/python3.4")
-#        try:
-#            import tkinter as Tk
-#            import tkinter.scrolledtext as Tk_sc
-#            import tkinter.filedialog as Tk_fd
-##            import messagebox as Tk_mb
-#            LTsv_Tkinter=True
-#        except:
-#            LTsv_Tkinter=False
 LTsv_libgtk,LTsv_libgdk,LTsv_libobj=None,None,None
 LTsv_user32,LTsv_shell32,LTsv_kernel32,LTsv_gdi32=None,None,None,None
 LTsv_GUI_ERROR,LTsv_GUI_GTK2,LTsv_GUI_Tkinter,LTsv_GUI_WinAPI="","GTK2","Tkinter","WinAPI"
@@ -110,12 +98,23 @@ def LTsv_global_WinAPI():                           return LTsv_GUI_WinAPI
 def LTsv_global_libgtk():                           return LTsv_libgtk
 def LTsv_global_libgdk():                           return LTsv_libgdk
 def LTsv_global_libobj():                           return LTsv_libobj
-def LTsv_global_canvasmotionX():                    return LTsv_canvas_motion_X
-def LTsv_global_canvasmotionY():                    return LTsv_canvas_motion_Y
 def LTsv_global_canvasmotionZ():                    return LTsv_canvas_motion_Z
+def LTsv_global_canvasmotionX(motionZ=None):
+    global LTsv_canvas_motion_X
+    if (motionZ != None):
+        LTsv_canvas_motion_X=LTsv_canvas_motion_X if motionZ == LTsv_canvas_motion_Z else -1
+    return LTsv_canvas_motion_X
+def LTsv_global_canvasmotionY(motionZ=None):
+    global LTsv_canvas_motion_Y
+    if (motionZ != None):
+        LTsv_canvas_motion_Y=LTsv_canvas_motion_Y if motionZ == LTsv_canvas_motion_Z else -1
+    return LTsv_canvas_motion_Y
 def LTsv_global_canvascolor():                    return LTsv_canvascolor
 def LTsv_global_canvasbgcolor():                    return LTsv_canvasbgcolor
-#def LTsv_global_widgetgetltsv():                    return LTsv_widgetLTSV
+def LTsv_global_canvasTAG(TkinterTAG=None):
+    global LTsv_Tkintercanvas_TAG
+    LTsv_Tkintercanvas_TAG=LTsv_Tkintercanvas_TAG if TkinterTAG == None else TkinterTAG
+    return LTsv_Tkintercanvas_TAG
 def LTsv_global_widgetltsv(new_LTSV=None):
     global LTsv_widgetLTSV
     LTsv_widgetLTSV=LTsv_widgetLTSV if new_LTSV == None else new_LTSV
@@ -154,8 +153,7 @@ def LTsv_widget_getobj(LTsv_widgetPAGE,LTsv_widgetoption):
 def LTsv_widgetPAGEXYWH(LTsv_widgetPAGE,widget_o=None,widget_k=None,widget_t=None,widget_u=None,widget_s=None,widget_e=None,widget_a=None,widget_v=None,widget_b=None, \
   widget_p=None,widget_m=None,widget_g=None,widget_f=None,widget_x=None,widget_y=None,widget_w=None,widget_h=None,widget_c=None, \
   event_z=None,event_k=None,event_y=None,event_b=None,event_p=None,event_r=None,event_e=None,event_m=None,event_l=None,event_a=None,event_u=None, \
-  menu_o=None,menu_b=None,menu_c=None,dialog_t=None,dialog_c=None, \
-  kbd_p=None,kbd_r=None,kbd_m=None,kbd_e=None,kbd_l=None,kbd_i=None,kbd_s=None,kbd_d=None,kbd_t=None,kbd_u=None,kbd_k=None):
+  menu_o=None,menu_b=None,menu_c=None,dialog_t=None,dialog_c=None):
     if widget_o != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"widgetobj",widget_o)
     if widget_k != None:  LTsv_widgetPAGE=LTsv_pushlinerest(LTsv_widgetPAGE,"widgetkind",widget_k)
     if widget_t != None:  LTsv_widgetPAGE=LTsv_pushlinerest(LTsv_widgetPAGE,"widgettext",widget_t)
@@ -190,49 +188,6 @@ def LTsv_widgetPAGEXYWH(LTsv_widgetPAGE,widget_o=None,widget_k=None,widget_t=Non
     if menu_c   != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"popupmenuclick",menu_c)
     if dialog_t != None:  LTsv_widgetPAGE=LTsv_pushlinerest(LTsv_widgetPAGE,"dialog_type",str(dialog_t))
     if dialog_c != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"dialog_close",dialog_c)
-    if kbd_p    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_press",kbd_p)
-    if kbd_r    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_release",kbd_r)
-    if kbd_m    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_motion",kbd_m)
-    if kbd_e    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_enter",kbd_e)
-    if kbd_l    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_leave",kbd_l)
-    if kbd_i    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_input",kbd_i)
-    if kbd_s    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_settext",kbd_s)
-    if kbd_d    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_deftext",kbd_d)
-    if kbd_t    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_gettext",kbd_t)
-    if kbd_u    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_geturi",kbd_u)
-    if kbd_k    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_‎keyenter",kbd_k)
-    return LTsv_widgetPAGE
-
-def LTsv_widgetPAGEKBD(LTsv_widgetPAGE,clip_a=None,clip_b=None,clip_c=None,clip_d=None,clip_e=None,clip_f=None,clip_g=None, \
-    clip_h=None,clip_i=None,clip_j=None,clip_k=None,clip_l=None,clip_m=None,clip_n=None, \
-    clip_o=None,clip_p=None,clip_q=None,clip_r=None,clip_s=None,clip_t=None,clip_u=None, \
-    clip_v=None,clip_w=None,clip_x=None,clip_y=None,clip_z=None):
-    if clip_a    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_A",clip_a)
-    if clip_b    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_V",clip_b)
-    if clip_c    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_copy",clip_c)
-    if clip_d    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_D",clip_d)
-    if clip_e    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_R",clip_e)
-    if clip_f    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_find",clip_f)
-    if clip_g    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_G",clip_g)
-    if clip_h    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_H",clip_h)
-    if clip_i    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_I",clip_i)
-    if clip_j    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_J",clip_j)
-    if clip_k    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_K",clip_k)
-    if clip_l    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_L",clip_l)
-    if clip_m    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_M",clip_m)
-    if clip_n    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_N",clip_n)
-    if clip_o    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_open",clip_o)
-    if clip_p    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_P",clip_p)
-    if clip_q    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_Q",clip_q)
-    if clip_r    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_R",clip_r)
-    if clip_s    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_save",clip_s)
-    if clip_t    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_T",clip_t)
-    if clip_u    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_U",clip_u)
-    if clip_v    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_‎paste",clip_v)
-    if clip_w    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_W",clip_w)
-    if clip_x    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_cut",clip_x)
-    if clip_y    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_Y",clip_y)
-    if clip_z    != None:  LTsv_widgetPAGE=LTsv_widget_newobj(LTsv_widgetPAGE,"editcanvas_Z",clip_z)
     return LTsv_widgetPAGE
 
 def LTsv_fonttuple(LTsv_line):
@@ -257,14 +212,19 @@ def LTsv_GTKwidget_fixed(window_c,widget_o,widget_x,widget_y,widget_w,widget_h,w
             LTsv_libgtk.gtk_widget_modify_font(widget_o,LTsv_fontDesc)
         LTsv_libgtk.pango_font_description_free(LTsv_fontDesc)
 
-def LTsv_tkinter_hideondelete_shell(LTsv_windowPAGENAME):
+def LTsv_hideondelete_shell(LTsv_windowPAGENAME=None):
+    def gtk_hideondelete_kernel(window_objvoid=None,window_objptr=None):
+        LTsv_libgtk.gtk_widget_hide_on_delete
+        return 0
     def tkinter_hideondelete_kernel(window_objvoid=None,window_objptr=None):
         global LTsv_widgetLTSV
         LTsv_windowPAGE=LTsv_getpage(LTsv_widgetLTSV,LTsv_windowPAGENAME)
         widget_o=LTsv_widgetOBJ[LTsv_readlinerest(LTsv_windowPAGE,"widgetobj")]
         widget_o.withdraw()
         return 0
-    return tkinter_hideondelete_kernel
+    if LTsv_GUI == LTsv_GUI_GTK2: return LTsv_libgtk.gtk_widget_hide_on_delete
+    if LTsv_GUI == LTsv_GUI_Tkinter: return tkinter_hideondelete_kernel
+    return None
 
 LTsv_GTK_WINDOW_TOPLEVEL=0
 LTsv_GTK_WIN_POS_CENTER=1
@@ -290,7 +250,9 @@ def LTsv_window_new(widget_n=None,event_b=None,widget_t="LTsv_window",widget_w=2
         LTsv_libgtk.gtk_window_set_position(window_o,LTsv_GTK_WIN_POS_CENTER)
         widget_c=LTsv_libgtk.gtk_fixed_new()
         LTsv_libgtk.gtk_container_add(window_o,widget_c)
-        event_b_cbk=LTsv_CALLBACLTYPE(event_b) if event_b != None else LTsv_libgtk.gtk_widget_hide_on_delete
+#        event_b_cbk=LTsv_CALLBACLTYPE(event_b) if event_b != None else LTsv_libgtk.gtk_widget_hide_on_delete
+#        event_b_cbk=LTsv_CALLBACLTYPE(event_b) if event_b != None else LTsv_hideondelete_shell(LTsv_windowPAGENAME)
+        event_b_cbk=LTsv_CALLBACLTYPE(event_b) if event_b != None else LTsv_window_exit_cbk
         LTsv_libobj.g_signal_connect_data(window_o,"delete-event".encode("utf-8"),event_b_cbk,0,0,0)
         event_z_cbk,event_k_cbk,event_y_cbk=None,None,None
         if event_z:
@@ -310,8 +272,10 @@ def LTsv_window_new(widget_n=None,event_b=None,widget_t="LTsv_window",widget_w=2
         window_o.title(widget_t)
         window_o.minsize(widget_w,widget_h)
         window_o.geometry("{0}x{1}+{2}+{3}".format(widget_w,widget_h,(window_o.winfo_vrootwidth()-widget_w)//2,(window_o.winfo_vrootheight()-widget_h)//2))
-        event_b_cbk=event_b if event_b != None else LTsv_tkinter_hideondelete_shell(LTsv_windowPAGENAME)
-        window_o.protocol("WM_DELETE_WINDOW",event_b_cbk)
+#        event_b_cbk=event_b if event_b != None else LTsv_hideondelete_shell(LTsv_windowPAGENAME)
+#        window_o.protocol("WM_DELETE_WINDOW",event_b_cbk)
+        if event_b != None:
+            window_o.protocol("WM_DELETE_WINDOW",event_b)
         if event_z:
             window_o.maxsize(window_o.winfo_vrootwidth(),window_o.winfo_vrootheight())
             window_o.bind('<Configure>',event_z)
@@ -321,7 +285,7 @@ def LTsv_window_new(widget_n=None,event_b=None,widget_t="LTsv_window",widget_w=2
             window_o.bind('<KeyPress>',event_k)
         if event_y:
             window_o.bind('<KeyRelease>',event_y)
-        LTsv_windowPAGE=LTsv_widgetPAGEXYWH(LTsv_windowPAGE,widget_o=window_o,widget_t=widget_t,event_b=event_b_cbk,event_z=event_z,event_k=event_k,event_y=event_y)
+        LTsv_windowPAGE=LTsv_widgetPAGEXYWH(LTsv_windowPAGE,widget_o=window_o,widget_t=widget_t,event_b=event_b,event_z=event_z,event_k=event_k,event_y=event_y)
     LTsv_widgetLTSV=LTsv_putpage(LTsv_widgetLTSV,LTsv_windowPAGENAME,LTsv_windowPAGE)
     return LTsv_windowPAGENAME
 
@@ -383,8 +347,6 @@ def LTsv_widget_settext(LTsv_widgetPAGENAME,widget_t=""):
                 widget_combo=LTsv_popupmenuOBJ[str(widget_o)].split('\n')
                 widget_s=widget_combo.index(widget_t) if widget_t in widget_combo else 0
                 LTsv_libgtk.gtk_combo_box_set_active(widget_o,widget_s)
-    if widget_k == "editcanvas":
-        LTsv_widgetOBJ[LTsv_readlinerest(LTsv_widgetPAGE,"editcanvas_deftext")](LTsv_widgetPAGENAME,TT=widget_t)
     if widget_k == "filedialog":
         if LTsv_GUI == LTsv_GUI_GTK2:     LTsv_libgtk.gtk_window_set_title(widget_o,widget_t.encode("utf-8","xmlcharrefreplace"))
         LTsv_widgetPAGE=LTsv_widgetPAGEXYWH(LTsv_widgetPAGE,widget_t=widget_t)
@@ -455,8 +417,6 @@ def LTsv_widget_gettext(LTsv_widgetPAGENAME):
         if LTsv_GUI == LTsv_GUI_GTK2:     widget_t=LTsv_readlinerest(LTsv_widgetPAGE,"widgettext")
     if widget_k == "combobox":
         if LTsv_GUI == LTsv_GUI_GTK2:     widget_t=ctypes.c_char_p(LTsv_libgtk.gtk_combo_box_text_get_active_text(widget_o)).value.decode("utf-8") if LTsv_libgtk.gtk_tree_model_iter_n_children(LTsv_libgtk.gtk_combo_box_get_model(widget_o),None) > 0 else ""
-    if widget_k == "editcanvas":
-        widget_t=LTsv_widgetOBJ[LTsv_readlinerest(LTsv_widgetPAGE,"editcanvas_gettext")](LTsv_widgetPAGENAME)
     if widget_k == "filedialog":
         if LTsv_GUI == LTsv_GUI_GTK2:     widget_t=ctypes.c_char_p(LTsv_libgtk.gtk_window_get_title(widget_o)).value.decode("utf-8")
     return widget_t
@@ -545,8 +505,6 @@ def LTsv_widget_seturi(LTsv_widgetPAGENAME,widget_u=""):
                 widget_o.hIcon=icon_o
                 LTsv_shell32.Shell_NotifyIcon(ctypes.c_ulong(LTsv_ICON_NIM_MODIFY),ctypes.pointer(widget_o))
         LTsv_widgetPAGE=LTsv_widgetPAGEXYWH(LTsv_widgetPAGE,widget_u=widget_u)
-    if widget_k == "editcanvas":
-        LTsv_widgetOBJ[LTsv_readlinerest(LTsv_widgetPAGE,"editcanvas_deftext")](LTsv_widgetPAGENAME,UT=widget_u)
     if widget_k == "filedialog":
         LTsv_widgetPAGE=LTsv_widgetPAGEXYWH(LTsv_widgetPAGE,widget_u=widget_u)
         LTsv_widgetLTSV=LTsv_putpage(LTsv_widgetLTSV,LTsv_widgetPAGENAME,LTsv_widgetPAGE)
@@ -561,8 +519,6 @@ def LTsv_widget_geturi(LTsv_widgetPAGENAME):
         widget_u=LTsv_readlinerest(LTsv_widgetPAGE,"widgeturi")
     if widget_k == "notify":
         widget_u=LTsv_readlinerest(LTsv_widgetPAGE,"widgeturi")
-    if widget_k == "editcanvas":
-        widget_u=LTsv_widgetOBJ[LTsv_readlinerest(LTsv_widgetPAGE,"editcanvas_geturi")](LTsv_widgetPAGENAME)
     if widget_k == "filedialog":
         try:
             if LTsv_GUI == LTsv_GUI_GTK2:    widget_u=ctypes.c_char_p(LTsv_libgtk.gtk_file_chooser_get_filename(widget_o)).value.decode("utf-8")
@@ -702,28 +658,38 @@ def LTsv_window_none(window_objvoid=None,window_objptr=None):
     return 0
 LTsv_window_none_cbk=LTsv_CALLBACLTYPE(LTsv_window_none)
 
-def LTsv_screen_w(LTsv_windowPAGENAME):
+def LTsv_screen_w(LTsv_windowPAGENAME=""):
     global LTsv_widgetLTSV
     LTsv_windowPAGE=LTsv_getpage(LTsv_widgetLTSV,LTsv_windowPAGENAME)
-    window_o=LTsv_widgetOBJ[LTsv_readlinerest(LTsv_windowPAGE,"widgetobj")]
+    if LTsv_windowPAGE in LTsv_widgetOBJ:
+        window_o=LTsv_widgetOBJ[LTsv_readlinerest(LTsv_windowPAGE,"widgetobj")]
+    else:
+        window_o=None
     screen_w=-1
     if LTsv_GUI == LTsv_GUI_GTK2:
         screen_w=LTsv_libgtk.gdk_screen_get_width(LTsv_libgtk.gdk_screen_get_default())
     if LTsv_GUI == LTsv_GUI_Tkinter:
-        if window_o!=None:
+        if window_o != None:
             screen_w=window_o.winfo_vrootwidth()
+#        else:
+#            screen_w=Tk.root.winfo_screenwidth()
     return screen_w
 
-def LTsv_screen_h(LTsv_windowPAGENAME):
+def LTsv_screen_h(LTsv_windowPAGENAME=""):
     global LTsv_widgetLTSV
     LTsv_windowPAGE=LTsv_getpage(LTsv_widgetLTSV,LTsv_windowPAGENAME)
-    window_o=LTsv_widgetOBJ[LTsv_readlinerest(LTsv_windowPAGE,"widgetobj")]
+    if LTsv_windowPAGE in LTsv_widgetOBJ:
+        window_o=LTsv_widgetOBJ[LTsv_readlinerest(LTsv_windowPAGE,"widgetobj")]
+    else:
+        window_o=None
     screen_h=-1
     if LTsv_GUI == LTsv_GUI_GTK2:
         screen_h=LTsv_libgtk.gdk_screen_height(LTsv_libgtk.gdk_screen_get_default())
     if LTsv_GUI == LTsv_GUI_Tkinter:
-        if window_o!=None:
+        if window_o != None:
             screen_h=window_o.winfo_vrootheight()
+#        else:
+#            screen_w=Tk.root.winfo_screenheight()
     return screen_h
 
 class LTsv_WINDOW_WIDTH(ctypes.Structure):
@@ -778,24 +744,24 @@ def LTsv_label_new(LTsv_windowPAGENAME,widget_n=None,widget_t="LTsv_label",widge
     LTsv_widgetLTSV=LTsv_putpage(LTsv_widgetLTSV,LTsv_widgetPAGENAME,LTsv_widgetPAGE)
     return LTsv_widgetPAGENAME
 
-def LTsv_image_new(LTsv_windowPAGENAME,widget_n=None,widget_t="LTsv_logo.png",widget_x=0,widget_y=0):
+def LTsv_image_new(LTsv_windowPAGENAME,widget_n=None,widget_u="LTsv_logo.png",widget_x=0,widget_y=0):
     global LTsv_widgetLTSV
     LTsv_windowPAGE=LTsv_getpage(LTsv_widgetLTSV,LTsv_windowPAGENAME)
     window_o=LTsv_widgetOBJ[LTsv_readlinerest(LTsv_windowPAGE,"widgetobj")]
     LTsv_widgetPAGENAME=LTsv_widget_newUUID(widget_n); LTsv_widgetPAGE=""
     LTsv_widgetPAGE=LTsv_widgetPAGEXYWH(LTsv_widgetPAGE,widget_k="image",widget_x=widget_x,widget_y=widget_y)
     if LTsv_GUI == LTsv_GUI_GTK2:
-        widget_p=LTsv_libgtk.gtk_image_new_from_file(widget_t.encode("utf-8","xmlcharrefreplace"))
+        widget_p=LTsv_libgtk.gtk_image_new_from_file(widget_u.encode("utf-8","xmlcharrefreplace"))
         widget_o=LTsv_libgtk.gtk_event_box_new()
         LTsv_libgtk.gtk_container_add(widget_o,widget_p)
         window_c=LTsv_widgetOBJ[LTsv_readlinerest(LTsv_windowPAGE,"widgetcontainer")]
         LTsv_libgtk.gtk_fixed_put(window_c,widget_o,widget_x,widget_y)
-        LTsv_widgetPAGE=LTsv_widgetPAGEXYWH(LTsv_widgetPAGE,widget_o=widget_o,widget_t=widget_t,widget_p=widget_p)
+        LTsv_widgetPAGE=LTsv_widgetPAGEXYWH(LTsv_widgetPAGE,widget_o=widget_o,widget_u=widget_u,widget_p=widget_p)
     if LTsv_GUI == LTsv_GUI_Tkinter:
-        widget_p=Tk.PhotoImage(file=widget_t)
+        widget_p=Tk.PhotoImage(file=widget_u)
         widget_o=Tk.Label(window_o,image=widget_p)
         widget_o.place(x=widget_x,y=widget_y)
-        LTsv_widgetPAGE=LTsv_widgetPAGEXYWH(LTsv_widgetPAGE,widget_o=widget_o,widget_t=widget_t,widget_p=widget_p)
+        LTsv_widgetPAGE=LTsv_widgetPAGEXYWH(LTsv_widgetPAGE,widget_o=widget_o,widget_u=widget_u,widget_p=widget_p)
     LTsv_widgetLTSV=LTsv_putpage(LTsv_widgetLTSV,LTsv_widgetPAGENAME,LTsv_widgetPAGE)
     return LTsv_widgetPAGENAME
 
@@ -1122,6 +1088,8 @@ def LTsv_canvas_new(LTsv_windowPAGENAME,widget_n=None,widget_x=0,widget_y=0,widg
     def LTsv_canvas_enter(window_objvoid=None,window_objptr=None):
         global LTsv_canvas_motion_X,LTsv_canvas_motion_Y,LTsv_canvas_motion_Z
         global canvas_CBKafter
+        LTsv_canvas_motion_X=LTsv_canvas_motion_X if LTsv_canvas_motion_X >= 0 else 0
+        LTsv_canvas_motion_Y=LTsv_canvas_motion_Y if LTsv_canvas_motion_X >= 0 else 0
         if canvas_CBKafter[LTsv_widgetPAGENAME] == False:
             canvas_CBKafter[LTsv_widgetPAGENAME]=True; LTsv_canvas_motion_Z=LTsv_widgetPAGENAME
             if canvas_EMLenter[LTsv_widgetPAGENAME] != None:
@@ -1147,10 +1115,10 @@ def LTsv_canvas_new(LTsv_windowPAGENAME,widget_n=None,widget_x=0,widget_y=0,widg
     def LTsv_canvas_leave(window_objvoid=None,window_objptr=None):
         global LTsv_canvas_motion_X,LTsv_canvas_motion_Y,LTsv_canvas_motion_Z
         global canvas_CBKafter,LTsv_canvasCBKpagename
+        LTsv_canvas_motion_X,LTsv_canvas_motion_Y=-1,-1
         canvas_CBKafter[LTsv_widgetPAGENAME]=False; LTsv_canvas_motion_Z=""
         if canvas_EMLleave[LTsv_widgetPAGENAME] != None:
             LTsv_window_after(LTsv_windowPAGENAME,event_b=canvas_EMLleave[LTsv_widgetPAGENAME],event_i="{0}_leave".format(LTsv_canvasCBKpagename[LTsv_widgetPAGENAME]),event_w=event_w)
-        LTsv_canvas_motion_X,LTsv_canvas_motion_Y=-1,-1
         return 0
     canvas_EMLenter[LTsv_widgetPAGENAME],canvas_EMLmotion[LTsv_widgetPAGENAME],canvas_EMLleave[LTsv_widgetPAGENAME]=event_e,event_m,event_l
     canvas_CBKenter[LTsv_widgetPAGENAME],canvas_CBKmotion[LTsv_widgetPAGENAME],canvas_CBKleave[LTsv_widgetPAGENAME]=LTsv_canvas_enter,LTsv_canvas_motion,LTsv_canvas_leave
@@ -1229,6 +1197,15 @@ def LTsv_draw_delete_shell(LTsv_GUI):
     if LTsv_GUI == LTsv_GUI_GTK2: return LTsv_drawGTK_delete
     if LTsv_GUI == LTsv_GUI_Tkinter: return LTsv_drawTkinter_delete
 
+def LTsv_drawTkinter_deleteTAG(TkinterTAG=None):
+    global LTsv_TkintercanvasPAGE,LTsv_Tkintercanvas_o,LTsv_Tkintercanvas_TAG
+    LTsv_Tkintercanvas_TAG=LTsv_Tkintercanvas_TAG if TkinterTAG == None else TkinterTAG
+    LTsv_Tkintercanvas_o.delete(LTsv_Tkintercanvas_TAG)
+
+def LTsv_draw_deleteTAG_shell(LTsv_GUI):
+    if LTsv_GUI == LTsv_GUI_GTK2: return LTsv_window_none
+    if LTsv_GUI == LTsv_GUI_Tkinter: return LTsv_drawTkinter_deleteTAG
+
 def LTsv_drawGTK_color(draw_c=""):
     global LTsv_canvascolor,LTsv_canvasbgcolor
     LTsv_canvascolor=draw_c
@@ -1257,12 +1234,6 @@ def LTsv_draw_bgcolor_shell(LTsv_GUI):
     if LTsv_GUI == LTsv_GUI_GTK2: return LTsv_drawGTK_bgcolor
     if LTsv_GUI == LTsv_GUI_Tkinter: return LTsv_drawTkinter_bgcolor
 
-def LTsv_drawGTK_gcfcolor():
-    LTsv_libgdk.gdk_gc_set_rgb_fg_color(LTsv_GTKcanvas_g,ctypes.pointer(LTsv_GTKcanvas_gccolor))
-
-def LTsv_drawGTK_gcbcolor():
-    LTsv_libgdk.gdk_gc_set_rgb_fg_color(LTsv_GTKcanvas_g,ctypes.pointer(LTsv_canvas_bccolor))
-
 def LTsv_drawGTK_polygon(*draw_xy):
     draw_xylen=len(draw_xy)//2; gdkpointsArrayType=LTsv_GDKPOINT*draw_xylen; gdkpointsArray=gdkpointsArrayType()
     for draw_xy_count,gdkpoint in enumerate(gdkpointsArray):
@@ -1287,17 +1258,11 @@ def LTsv_drawGTK_polygonfill(*draw_xy):
 def LTsv_drawTkinter_polygonfill(*draw_xy):
     xyloop=draw_xy if len(draw_xy)%2 == 0 else draw_xy[:-1]
     if len(xyloop) > 0:
-#        LTsv_Tkintercanvas_o.create_polygon(*xyloop,fill=LTsv_canvascolor,outline=LTsv_canvascolor,tag=LTsv_Tkintercanvas_TAG)
         LTsv_Tkintercanvas_o.create_polygon(*xyloop,fill=LTsv_canvascolor,outline="",tag=LTsv_Tkintercanvas_TAG)
 
 def LTsv_draw_polygonfill_shell(LTsv_GUI):
     if LTsv_GUI == LTsv_GUI_GTK2: return LTsv_drawGTK_polygonfill
     if LTsv_GUI == LTsv_GUI_Tkinter: return LTsv_drawTkinter_polygonfill
-
-def LTsv_drawTkinter_fontfill(*draw_xy):
-    xyloop=draw_xy if len(draw_xy)%2 == 0 else draw_xy[:-1]
-    if len(xyloop) > 0:
-        LTsv_Tkintercanvas_o.create_polygon(*xyloop,fill=LTsv_canvasbgcolor,outline=LTsv_canvasbgcolor,tag=LTsv_Tkintercanvas_TAG)
 
 def LTsv_drawGTK_squares(draw_wh=16,*draw_xy):
     for draw_xy_count in range(len(draw_xy)//2):
@@ -1489,12 +1454,12 @@ def LTsv_draw_canvas_save(LTsv_canvasPAGENAME,LTsv_picturenewpath):
 #        canvas_d.paste(canvas_o,(0,0))
 #        canvas_d.save(fileName,returnFormat(LTsv_picturenewext))
 
-def LTsv_drawGTK_picture(draw_t="",draw_x=0,draw_y=0):
-    picture_o,picture_w,picture_h=LTsv_pictureOBJ[draw_t],LTsv_pictureW[draw_t],LTsv_pictureH[draw_t]
+def LTsv_drawGTK_picture(LTsv_picturepath,draw_x=0,draw_y=0):
+    picture_o,picture_w,picture_h=LTsv_pictureOBJ[LTsv_picturepath],LTsv_pictureW[LTsv_picturepath],LTsv_pictureH[LTsv_picturepath]
     LTsv_libgdk.gdk_draw_pixbuf(LTsv_GTKcanvas_m,LTsv_GTKcanvas_g,picture_o,0,0,draw_x,draw_y,picture_w,picture_h,0,0,0)
 
-def LTsv_drawTkinter_picture(draw_t="",draw_x=0,draw_y=0):
-    picture_o,picture_w,picture_h=LTsv_pictureOBJ[draw_t],LTsv_pictureW[draw_t],LTsv_pictureH[draw_t]
+def LTsv_drawTkinter_picture(LTsv_picturepath,draw_x=0,draw_y=0):
+    picture_o,picture_w,picture_h=LTsv_pictureOBJ[LTsv_picturepath],LTsv_pictureW[LTsv_picturepath],LTsv_pictureH[LTsv_picturepath]
     LTsv_Tkintercanvas_o.create_image(draw_x,draw_y,image=picture_o,anchor="nw",tag=LTsv_Tkintercanvas_TAG)
 
 def LTsv_draw_picture_shell(LTsv_GUI):
@@ -1701,7 +1666,7 @@ def debug_canvas(window_objvoid=None,window_objptr=None):
     LTsv_draw_delete("white")
     LTsv_draw_font(debug_font_entry)
     LTsv_draw_color("#fffff0"); LTsv_draw_polygonfill(0,0,debug_canvas_W,0,debug_canvas_W,debug_canvas_H,0,debug_canvas_H)
-    mouse_x,mouse_y=LTsv_global_canvasmotionX(),LTsv_global_canvasmotionY()
+    mouse_x,mouse_y=LTsv_global_canvasmotionX(debug_keysetup_canvas),LTsv_global_canvasmotionY(debug_keysetup_canvas)
     LTsv_draw_color(debug_scaleRGB); LTsv_draw_text("mouseX,Y\n[{0},{1}]".format(mouse_x,mouse_y),draw_x=mouse_x,draw_y=mouse_y)
     LTsv_putdaytimenow(); LTsv_checkFPS()
     LTsv_draw_color("black"); LTsv_draw_text(LTsv_getdaytimestr(LTsv_widget_gettext(debug_keysetup_timentry)),draw_x=0,draw_y=0)
@@ -1758,13 +1723,19 @@ def debug_polygonpoints(callback_void=None,callback_ptr=None):
         debug_polygonpointlist.pop()
     LTsv_widget_settext(debug_keysetup_polygonentry,widget_t="{0}".format(debug_polygonpointlist))
 
+def debug_polygonbutton(callback_void=None,callback_ptr=None):
+    global debug_polygonpointlist
+    if len(debug_polygonpointlist) >= 2:
+        debug_polygonpointlist.pop(); debug_polygonpointlist.pop()
+    LTsv_widget_settext(debug_keysetup_polygonentry,widget_t="{0}".format(debug_polygonpointlist))
+
 def debug_activewindow(callback_void=None,callback_ptr=None):
     LTsv_widget_settext(debug_keysetup_activelabel,widget_t=LTsv_window_foreground())
     LTsv_window_after(debug_keysetup_window,event_b=debug_activewindow,event_i="debug_activewindow",event_w=500)
 
 def debug_canvas_press(callback_void=None,callback_ptr=None):
     global debug_polygonpointlist
-    mouse_x,mouse_y=LTsv_global_canvasmotionX(),LTsv_global_canvasmotionY()
+    mouse_x,mouse_y=LTsv_global_canvasmotionX(debug_keysetup_canvas),LTsv_global_canvasmotionY(debug_keysetup_canvas)
     LTsv_setkbddata(0,25); debug_getkbdstr=LTsv_getkbdlabels("MouseL\tMouseR\tMouseC")
     cursorLCR="{0}{1}{2}".format(LTsv_pickdatalabel(debug_getkbdstr,"MouseL"),LTsv_pickdatalabel(debug_getkbdstr,"MouseC"),LTsv_pickdatalabel(debug_getkbdstr,"MouseR"))
     if cursorLCR == "100" or cursorLCR == "000":
@@ -1773,12 +1744,6 @@ def debug_canvas_press(callback_void=None,callback_ptr=None):
         debug_polygonbutton()
     LTsv_widget_settext(debug_keysetup_polygonentry,widget_t="{0}".format(debug_polygonpointlist))
     LTsv_widget_focus(debug_keysetup_polygonentry)
-
-def debug_polygonbutton(callback_void=None,callback_ptr=None):
-    global debug_polygonpointlist
-    if len(debug_polygonpointlist) >= 2:
-        debug_polygonpointlist.pop(); debug_polygonpointlist.pop()
-    LTsv_widget_settext(debug_keysetup_polygonentry,widget_t="{0}".format(debug_polygonpointlist))
 
 def debug_color_scale(window_objvoid=None,window_objptr=None):
     global debug_scaleRGB
@@ -1900,6 +1865,7 @@ if __name__=="__main__":
             LTsv_widget_disableenable(debug_keysetup_spin[debug_kbdxy],False)
             debug_kbdcodename="「{0}」({1})".format(debug_kbdlabel,LTsv_kbdgettypename(LTsv_kbdgettypegana(debug_kbdlabel))) if debug_kbdlabel != "NFER" and debug_kbdlabel != "NFER" and debug_kbdlabel != "XFER" and debug_kbdlabel != "KANA" else "「{0}」".format(debug_kbdlabel)
             debug_keysetup_label[debug_kbdxy]=LTsv_label_new(debug_keysetup_window,widget_t=debug_kbdcodename,widget_x=debug_keyspin_X+debug_kbdx,widget_y=debug_keyspin_Y+debug_kbd_y-debug_keyspin_H,widget_w=debug_keyspin_W if debug_kbdlabel != "　" else debug_keyspin_W*3,widget_h=debug_keyspin_H,widget_f=debug_font_entry)
+        debug_image=LTsv_image_new(debug_keysetup_window,widget_u=LTsv10_logoPATH,widget_x=debug_keysetup_W-LTsv_global_pictureW(LTsv10_logoPATH),widget_y=debug_keyspin_Y+debug_keyspin_H)
         debug_edit=LTsv_edit_new(debug_keysetup_window,widget_t="",widget_x=0,widget_y=debug_keysetup_H-debug_keyspin_H*4,widget_w=debug_keyspin_W*2,widget_h=debug_keyspin_H*4,widget_f=debug_font_entry)
         debug_clipboard=LTsv_clipboard_new(debug_keysetup_window)
         debug_clipbutton=LTsv_button_new(debug_keysetup_window,widget_t="clip",widget_x=0,widget_y=debug_keysetup_H-debug_keyspin_H*5,widget_w=debug_keyspin_W*1,widget_h=debug_keyspin_H*1,widget_f=debug_font_entry,event_b=debug_edit_clip)

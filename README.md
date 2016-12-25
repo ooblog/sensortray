@@ -40,8 +40,10 @@ sensors&#40;lm&#95;sensors&#41;コマンドを使えるようにしておくこ�
 
 ## 動作環境。
 
-Python2.7.3&#40;PuppyLinux571JP&#41;およびPython3.4.3&#40;Wine1.7.18&#41;で動作を確認しています。  
-Windowsでは以下の２点で起動はすれど動作しません。  
+Python 2.7.6&#40;Tahrpup6.0.5&#41;で動作を確認しています。  
+「[LTsv/](LTsv/ "LTsv/"」フォルダ内のモジュールの詳細は「[LTsv10kanedit(tsvtool10)](https://github.com/ooblog/LTsv10kanedit "「LTsv10kanedit(tsvtool10)」は「L:Tsv」の読み書きを中心としたモジュール群と漢字エディタ「kanedit」のPythonによる実装の予定です。")」を参考。  
+
+Windowsでは以下２点の理由で起動はすれど動作しません。  
 1.Tkinterで通知タスクトレイ&#40;Notify&#41;クリックからのポップアップメニュー出現方法が不明。  
 2.そもそもWindowsでCPU温度を所得する方法が不明。  
 
